@@ -1,0 +1,139 @@
+.objectCard {
+    background: white;
+    padding: 1.25rem;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    min-height: auto;
+}
+
+.objectCard:hover {
+    border-color: #3b82f6;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+}
+
+.dl {
+    margin: 0;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.5rem 1rem;
+    align-items: start;
+}
+
+.dt {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    grid-column: 1;
+}
+
+.dd {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #1f2937;
+    margin: 0;
+    line-height: 1.4;
+    grid-column: 2;
+    word-break: break-word;
+}
+
+.name {
+    color: #3b82f6 !important;
+    text-decoration: none !important;
+    transition: color 0.2s ease;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+}
+
+.objectCard:hover .name {
+    color: #2563eb !important;
+}
+
+.date {
+    color: #6b7280;
+    font-size: 0.85rem !important;
+    font-weight: 400 !important;
+}
+
+.deleteButton {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    padding: 0.4rem 0.8rem;
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.deleteButton:hover {
+    background: #dc2626;
+    color: white;
+    transform: scale(1.05);
+}
+
+.deleteButton:active {
+    transform: scale(1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .objectCard {
+        padding: 1rem;
+    }
+
+    .dl {
+        grid-template-columns: 1fr;
+        gap: 0.25rem;
+    }
+
+    .dt, .dd {
+        grid-column: 1;
+    }
+
+    .dt {
+        font-size: 0.7rem;
+        margin-top: 0.5rem;
+    }
+
+    .dd {
+        font-size: 0.9rem;
+    }
+
+    .name {
+        font-size: 0.95rem !important;
+        margin-bottom: 0.5rem;
+    }
+
+    .deleteButton {
+        position: relative;
+        top: auto;
+        right: auto;
+        margin-top: 1rem;
+        width: 100%;
+        padding: 0.6rem;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .objectCard {
+        padding: 0.875rem;
+    }
+
+    .deleteButton {
+        padding: 0.5rem;
+        font-size: 0.75rem;
+    }
+}

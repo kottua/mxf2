@@ -1,0 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+.section {
+    background: #f8fafc;
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    font-family: 'Inter', sans-serif;
+}
+
+.header {
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.header h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 0.5rem 0;
+}
+
+.instruction {
+    color: #64748b;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.cancelButton {
+    padding: 0.5rem 1rem;
+    background: #6b7280;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-bottom: 1.5rem;
+}
+
+.cancelButton:hover {
+    background: #4b5563;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.formGroup label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.formGroup input {
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.formGroup input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.formGroup input::placeholder {
+    color: #9ca3af;
+}
+
+.submitButton {
+    padding: 0.75rem 1.5rem;
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    align-self: flex-start;
+}
+
+.submitButton:hover {
+    background: #059669;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .section {
+        padding: 1.5rem;
+    }
+
+    .header h2 {
+        font-size: 1.3rem;
+    }
+
+    .formGroup input {
+        padding: 0.625rem 0.875rem;
+    }
+
+    .submitButton {
+        align-self: stretch;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .section {
+        padding: 1.25rem;
+    }
+
+    .header h2 {
+        font-size: 1.2rem;
+    }
+
+    .instruction {
+        font-size: 0.9rem;
+    }
+
+    .cancelButton {
+        width: 100%;
+        padding: 0.75rem;
+    }
+
+    .submitButton {
+        padding: 1rem;
+    }
+}

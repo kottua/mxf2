@@ -1,0 +1,272 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+.section {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    font-family: 'Inter', sans-serif;
+}
+
+.section h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 1.5rem 0;
+    text-align: center;
+}
+
+.currentConfig {
+    background: #f8fafc;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 1.5rem;
+}
+
+.currentConfig summary {
+    font-weight: 600;
+    color: #374151;
+    cursor: pointer;
+    padding: 0.5rem;
+    list-style: none;
+}
+
+.currentConfig summary::-webkit-details-marker {
+    display: none;
+}
+
+.currentConfig summary::before {
+    content: '📋 ';
+}
+
+.currentConfig pre {
+    background: white;
+    padding: 1rem;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    overflow-x: auto;
+    font-size: 0.8rem;
+    margin-top: 1rem;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.fieldsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.fieldLabel {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: #f9fafb;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.fieldLabel:hover {
+    border-color: #3b82f6;
+    background: #f0f9ff;
+}
+
+.fieldLabel input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.fieldLabel span {
+    font-weight: 500;
+    color: #374151;
+    flex: 1;
+}
+
+.weightsSection {
+    background: #f8fafc;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.weightsSection h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 1rem 0;
+    text-align: center;
+}
+
+.totalWeight {
+    text-align: center;
+    font-weight: 600;
+    color: #059669;
+    margin-bottom: 1.5rem;
+    padding: 0.75rem;
+    background: #f0fdf4;
+    border-radius: 8px;
+    border: 1px solid #bbf7d0;
+}
+
+.weightsGrid {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.weightItem {
+    background: white;
+    padding: 1.25rem;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.weightHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.weightFieldName {
+    font-weight: 600;
+    color: #374151;
+    font-size: 1rem;
+}
+
+.weightValue {
+    font-weight: 600;
+    color: #3b82f6;
+    font-size: 1.1rem;
+}
+
+.sliderContainer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.slider {
+    flex: 1;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: #e5e7eb;
+    border-radius: 3px;
+    outline: none;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+}
+
+.slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+}
+
+.sliderPercentage {
+    min-width: 60px;
+    text-align: center;
+    font-weight: 600;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .section {
+        padding: 1.5rem;
+    }
+
+    .section h3 {
+        font-size: 1.3rem;
+    }
+
+    .fieldsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .fieldLabel {
+        padding: 0.875rem;
+    }
+
+    .weightsSection {
+        padding: 1.25rem;
+    }
+
+    .weightsSection h4 {
+        font-size: 1.1rem;
+    }
+
+    .weightItem {
+        padding: 1rem;
+    }
+
+    .sliderContainer {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .slider {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .section {
+        padding: 1.25rem;
+    }
+
+    .section h3 {
+        font-size: 1.2rem;
+    }
+
+    .fieldLabel {
+        padding: 0.75rem;
+    }
+
+    .weightHeader {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+
+    .weightValue {
+        font-size: 1rem;
+    }
+}
+
+/* Animation for smooth transitions */
+.fieldLabel {
+    transition: all 0.3s ease;
+}
+
+.slider::-webkit-slider-thumb {
+    transition: all 0.2s ease;
+}
+
+.slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    background: #2563eb;
+}

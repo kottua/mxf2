@@ -1,0 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+body {
+    background-color: #f9fafb;
+}
+
+.globalContainer {
+    box-sizing: border-box;
+    margin-left: 15%;
+    margin-right: 15%;
+}
+
+@media (max-width: 768px) {
+    .globalContainer {
+        margin-left: 10%;
+        margin-right: 10%;
+    }
+}
+@media (max-width: 480px) {
+    .globalContainer {
+        margin-left: 3%;
+        margin-right: 3%;
+    }
+}

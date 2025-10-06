@@ -1,0 +1,94 @@
+.section {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    margin-bottom: 1rem;
+}
+
+.sectionTitle {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 1rem 0;
+    text-align: center;
+}
+
+.selectorsContainer {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-weight: 500;
+    color: #374151;
+    font-size: 0.9rem;
+}
+
+.select {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: #1f2937;
+    background: white;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+    min-width: 160px;
+}
+
+.select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.select:hover {
+    border-color: #9ca3af;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .section {
+        padding: 0.75rem;
+    }
+
+    .sectionTitle {
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .selectorsContainer {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .select {
+        min-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .section {
+        padding: 0.5rem;
+    }
+
+    .sectionTitle {
+        font-size: 0.95rem;
+    }
+
+    .label {
+        font-size: 0.85rem;
+    }
+
+    .select {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.85rem;
+    }
+}
