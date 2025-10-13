@@ -1,4 +1,5 @@
 import type { Premises } from "../interfaces/Premises.ts";
+import type { RealEstateObjectData } from "../interfaces/RealEstateObjectData.ts";
 import {api} from "./BaseApi.ts";
 
 export interface PremisesCreateRequest {
@@ -34,5 +35,35 @@ export async function updatePremisesBulk(request: PremisesCreateRequest[]){
     const { data } = await api.post<Premises[]>("/premises/bulk", {
         "premises": request
     });
+    return data;
+}
+
+export interface UploadSpecificationParams {
+    page?: number;
+    per_page?: number;
+}
+
+export async function uploadSpecificationFile(
+    file: File
+): Promise<RealEstateObjectData[]> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const { data } = await api.post<RealEstateObjectData[]>(
+        "/premises/upload/specification", 
+        formData,
+        {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        }
+    );
+
+    // Validate that we received an array
+    if (!Array.isArray(data)) {
+        console.error('API response is not an array:', data);
+        throw new Error('API response is not in expected format');
+    }
+    
     return data;
 }

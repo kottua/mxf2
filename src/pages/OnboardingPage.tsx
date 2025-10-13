@@ -60,8 +60,19 @@ function OnboardingPage() {
     async function saveSpecificationData(){
         setIsLoading(true);
         try {
-            if (previewSpecData.length === 0) return;
-            const transformedData = transformToPremisesCreateRequest(previewSpecData, Number(id));
+            if (!previewSpecData || previewSpecData.length === 0) return;
+            
+            // Filter out invalid data before saving
+            const validData = previewSpecData.filter(item => 
+                item && typeof item === 'object' && Object.keys(item).length > 0
+            );
+            
+            if (validData.length === 0) {
+                alert('Немає валідних даних для збереження.');
+                return;
+            }
+            
+            const transformedData = transformToPremisesCreateRequest(validData, Number(id));
             const response = await updatePremisesBulk(transformedData);
             const newActiveObject = {...activeObject, premises: response};
             setActiveObject(newActiveObject);
@@ -78,12 +89,21 @@ function OnboardingPage() {
         setIsLoading(true);
         try {
             if (previewIncomeData.length === 0) return;
+            
+            console.log('Original income plan data:', previewIncomeData);
+            console.log('First item structure:', previewIncomeData[0]);
+            console.log('Available keys:', Object.keys(previewIncomeData[0] || {}));
+            
             const transformedData = transformToIncomePlanCreateRequest(previewIncomeData, Number(id));
+            console.log('Transformed data for API:', transformedData);
+            console.log('First transformed item:', transformedData[0]);
+            
             const response = await updateIncomePlanBulk(transformedData);
             const newActiveObject = {...activeObject, income_plans: response};
             setActiveObject(newActiveObject);
         } catch (error) {
             console.error('Error saving income plan data:', error);
+            console.error('Error response:', error.response?.data);
             alert('Не вдалося зберегти дані плану доходів.');
         } finally {
             setIsLoading(false);
@@ -136,7 +156,11 @@ function OnboardingPage() {
                     previewSpecData={previewSpecData}
                     setPreviewSpecData={setPreviewSpecData}
                 />
-                <button onClick={saveSpecificationData} className={styles.saveButton} disabled={previewSpecData.length === 0}>
+                <button 
+                    onClick={saveSpecificationData} 
+                    className={styles.saveButton} 
+                    disabled={!previewSpecData || previewSpecData.length === 0 || !previewSpecData.some(item => item && typeof item === 'object' && Object.keys(item).length > 0)}
+                >
                     Зберегти дані специфікації
                 </button>
             </section>

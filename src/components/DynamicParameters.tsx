@@ -1,6 +1,7 @@
 import type {Premises} from "../interfaces/Premises.ts";
 import {useEffect, useState} from "react";
 import type {DynamicParametersConfig} from "../interfaces/DynamicParametersConfig.ts";
+import {getFieldDisplayName} from "../constants/fieldTranslations.ts";
 import styles from "./DynamicParameters.module.css";
 
 interface DynamicParametersProps {
@@ -117,7 +118,7 @@ function DynamicParameters({premises, currentConfig, onConfigChange}: DynamicPar
                             onChange={() => handleFieldToggle(field)}
                             id={`${field}_box`}
                         />
-                        <span>{field}</span>
+                        <span>{getFieldDisplayName(field)}</span>
                     </label>
                 ))}
             </div>
@@ -133,7 +134,7 @@ function DynamicParameters({premises, currentConfig, onConfigChange}: DynamicPar
                         {selectedFields.map(field => (
                             <div key={field} className={styles.weightItem}>
                                 <div className={styles.weightHeader}>
-                                    <span className={styles.weightFieldName}>{field}</span>
+                                    <span className={styles.weightFieldName}>{getFieldDisplayName(field)}</span>
                                     <span className={styles.weightValue}>
                                         {((config.weights[field] || 0) * 100).toFixed(1)}%
                                     </span>

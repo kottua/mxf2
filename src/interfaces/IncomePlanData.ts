@@ -6,5 +6,5 @@ export interface IncomePlanData {
     'planned_sales_revenue'?: number;
     'price_per_sqm'?: number;
     'price_per_sqm_end'?: number;
-    custom_fields?: Record<string, unknown>;
+    customcontent?: Record<string, unknown>;
 }

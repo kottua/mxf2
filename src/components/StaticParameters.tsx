@@ -105,7 +105,7 @@ function StaticParameters({ currentConfig, setStaticConfig, incomePlans, premise
             <form onSubmit={handleSubmit} className={styles.form}>
                 <div className={styles.formGrid}>
                     <div className={styles.formGroup}>
-                        <label htmlFor="negotiation_discount" className={styles.label}>Bargain gap</label>
+                        <label htmlFor="negotiation_discount" className={styles.label}>Розмір торгу</label>
                         <input
                             type="number"
                             onChange={(e) => setBargainGap(Number(e.target.value))}
@@ -117,7 +117,7 @@ function StaticParameters({ currentConfig, setStaticConfig, incomePlans, premise
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label htmlFor="maxify_factor" className={styles.label}>Maxify factor</label>
+                        <label htmlFor="maxify_factor" className={styles.label}>Фактор максимізації</label>
                         <input
                             type="number"
                             onChange={(e) => setMaxifyFactor(Number(e.target.value))}
@@ -129,7 +129,7 @@ function StaticParameters({ currentConfig, setStaticConfig, incomePlans, premise
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label htmlFor="current_price_per_sqm" className={styles.label}>Onboarding price per sq.m</label>
+                        <label htmlFor="current_price_per_sqm" className={styles.label}>Базова ціна за м²</label>
                         <input
                             type="number"
                             id='current_price_per_sqm'
@@ -140,7 +140,7 @@ function StaticParameters({ currentConfig, setStaticConfig, incomePlans, premise
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label htmlFor="minimum_liq_refusal_price" className={styles.label}>Minimum liquidity refusal price per sq.m</label>
+                        <label htmlFor="minimum_liq_refusal_price" className={styles.label}>Мінімальна ціна ліквідності за м²</label>
                         <input
                             type="number"
                             onChange={(e) => setMinimumLiqRefusalPrice(Number(e.target.value))}
@@ -153,7 +153,7 @@ function StaticParameters({ currentConfig, setStaticConfig, incomePlans, premise
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label htmlFor="maximum_liq_refusal_price" className={styles.label}>Maximum liquidity refusal price per sq.m</label>
+                        <label htmlFor="maximum_liq_refusal_price" className={styles.label}>Максимальна ціна ліквідності за м²</label>
                         <input
                             type="number"
                             onChange={(e) => setMaximumLiqRefusalPrice(Number(e.target.value))}
@@ -166,7 +166,7 @@ function StaticParameters({ currentConfig, setStaticConfig, incomePlans, premise
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label htmlFor="overestimate_correct_factor" className={styles.label}>Overestimate correction factor</label>
+                        <label htmlFor="overestimate_correct_factor" className={styles.label}>Фактор корекції завищення</label>
                         <input
                             type="number"
                             onChange={(e) => setOverestimateCorrectFactor(Number(e.target.value))}
@@ -178,20 +178,20 @@ function StaticParameters({ currentConfig, setStaticConfig, incomePlans, premise
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label htmlFor="oversold_method" className={styles.label}>Oversold method</label>
+                        <label htmlFor="oversold_method" className={styles.label}>Метод розрахунку продажів</label>
                         <select
                             onChange={(e) => setOversoldMethod(e.target.value as 'pieces' | 'area')}
                             id='oversold_method'
                             value={oversold_method}
                             className={styles.select}
                         >
-                            <option value="pieces">pieces</option>
-                            <option value="area">area</option>
+                            <option value="pieces">За кількістю</option>
+                            <option value="area">За площею</option>
                         </select>
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label htmlFor="sigma" className={styles.label}>Sigma (for similarity)</label>
+                        <label htmlFor="sigma" className={styles.label}>Сигма (для подібності)</label>
                         <input
                             type="number"
                             onChange={(e) => setSigma(Number(e.target.value))}
@@ -204,7 +204,7 @@ function StaticParameters({ currentConfig, setStaticConfig, incomePlans, premise
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label htmlFor="similarityThreshold" className={styles.label}>Similarity Threshold</label>
+                        <label htmlFor="similarityThreshold" className={styles.label}>Поріг подібності</label>
                         <input
                             type="number"
                             onChange={(e) => setSimilarityThreshold(Number(e.target.value))}
@@ -259,7 +259,7 @@ function StaticParameters({ currentConfig, setStaticConfig, incomePlans, premise
                     {/*</div>*/}
                     <div className={styles.formGroup}>
                         <label htmlFor="distributionConfig" className={styles.label}>
-                            Distribution Config
+                            Конфігурація дистрибуції
                         </label>
                         <select
                             id="distributionConfig"
@@ -273,7 +273,7 @@ function StaticParameters({ currentConfig, setStaticConfig, incomePlans, premise
                             </option>
                             {distribConfigs.map((config) => (
                                 <option key={config.id} value={config.id}>
-                                    {config.func_name || `Config ${config.id}`}
+                                    {config.func_name || `Конфігурація ${config.id}`}
                                 </option>
                             ))}
                         </select>

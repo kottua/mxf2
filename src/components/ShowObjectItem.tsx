@@ -9,8 +9,8 @@ interface ShowObjectItemProps {
     onDelete: (id: number) => void;
 }
 
-function ShowObjectItem({id, name, created, onClick, onDelete}: ShowObjectItemProps) {
-    const formattedDate = new Date(created).toLocaleString('uk-UA', {
+function ShowObjectItem({id, name, created_at, onClick, onDelete}: ShowObjectItemProps) {
+    const formattedDate = new Date(created_at).toLocaleString('uk-UA', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',

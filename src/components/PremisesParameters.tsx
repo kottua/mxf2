@@ -1,5 +1,6 @@
 import type { Premises } from "../interfaces/Premises.ts";
 import { useState } from "react";
+import {getFieldDisplayName} from "../constants/fieldTranslations.ts";
 import styles from './PremisesParameters.module.css';
 
 interface PremisesParametersProps {
@@ -255,7 +256,7 @@ function PremisesParameters({ premises, selectedColumns, priorities, setPrioriti
                             initializePrioritiesForColumn(name);
                         }}
                     >
-                        {name}
+                        {getFieldDisplayName(name)}
                     </div>
                 ))}
             </div>
@@ -263,7 +264,7 @@ function PremisesParameters({ premises, selectedColumns, priorities, setPrioriti
             {selectedColumn && priorities[selectedColumn] && (
                 <>
                     <div className={styles.valuesSection}>
-                        <h3>Унікальні значення для {selectedColumn}</h3>
+                        <h3>Унікальні значення для {getFieldDisplayName(selectedColumn)}</h3>
                         <p className={styles.instructions}>
                             Оберіть значення для групування (до 3) або налаштуйте пріоритети нижче
                         </p>
@@ -311,7 +312,7 @@ function PremisesParameters({ premises, selectedColumns, priorities, setPrioriti
 
                     {priorities[selectedColumn]?.length > 0 && (
                         <div className={styles.prioritiesSection}>
-                            <h3>Пріоритети для {selectedColumn}</h3>
+                            <h3>Пріоритети для {getFieldDisplayName(selectedColumn)}</h3>
                             <p className={styles.instructions}>
                                 Встановіть пріоритети (1 - найвищий)
                             </p>

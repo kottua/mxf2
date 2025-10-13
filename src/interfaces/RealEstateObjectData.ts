@@ -23,5 +23,5 @@ export interface RealEstateObjectData {
     Studio?: boolean | string;
     Status?: string;
     'Sales amount'?: number;
-    custom_fields?: Record<string, unknown>;
+    customcontent?: Record<string, unknown>;
 }

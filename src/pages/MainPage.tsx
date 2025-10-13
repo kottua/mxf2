@@ -4,11 +4,14 @@ import type {RealEstateObject} from "../interfaces/RealEstateObject.ts";
 import {createRealEstateObject, deleteRealEstateObject, fetchRealEstateObjects} from "../api/RealEstateObjectApi.ts";
 import ShowObjectItem from "../components/ShowObjectItem.tsx";
 import CreateEmptyObject from "../components/CreateEmptyObject.tsx";
+import Notification from "../components/Notification.tsx";
+import {useNotification} from "../hooks/useNotification.ts";
 import styles from './MainPage.module.css';
 
 function MainPage() {
     const [objects, setObjects] = useState<RealEstateObject[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const { notifications, removeNotification, showError, showSuccess } = useNotification();
 
     const navigate = useNavigate();
 
@@ -34,8 +37,15 @@ function MainPage() {
             const newObject = await createRealEstateObject(name || "Новий об'єкт");
             setObjects(prevObjects => [...prevObjects, newObject]);
             navigate('/onboarding/' + newObject.id);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error creating real estate object:", error);
+            
+            // Check if the error is about duplicate name
+            if (error?.response?.data?.message === "Real Estate with this name already exists") {
+                showError('Об\'єкт з таким ім\'ям вже існує. Будь ласка, виберіть інше ім\'я.');
+            } else {
+                showError('Не вдалося створити об\'єкт. Спробуйте ще раз пізніше.');
+            }
         } finally {
             setIsLoading(false);
         }
@@ -49,7 +59,7 @@ function MainPage() {
             setObjects(prevObjects => prevObjects.filter(obj => obj.id !== objId));
         } catch (error) {
             console.error("Error deleting real estate object:", error);
-            alert('Не вдалося видалити об\'єкт. Спробуйте ще раз пізніше.');
+            showError('Не вдалося видалити об\'єкт. Спробуйте ще раз пізніше.');
         } finally {
             setIsLoading(false);
         }
@@ -104,6 +114,16 @@ function MainPage() {
                     )}
                 </section>
             </main>
+            
+            {/* Notifications */}
+            {notifications.map(notification => (
+                <Notification
+                    key={notification.id}
+                    message={notification.message}
+                    type={notification.type}
+                    onClose={() => removeNotification(notification.id)}
+                />
+            ))}
         </div>
     );
 }

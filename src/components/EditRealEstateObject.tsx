@@ -1,5 +1,6 @@
 import {type FormEvent, useState} from "react";
 import {changeRealEstateObject} from "../api/RealEstateObjectApi.ts";
+import {useNotification} from "../hooks/useNotification.ts";
 import styles from './EditRealEstateObject.module.css';
 
 interface EditRealEstateObjectProps {
@@ -20,6 +21,7 @@ function EditRealEstateObject({ id, name, lat, lon, curr, url, setIsEditMode }: 
     const [formCurr, setFormCurr] = useState(curr || '');
     const [formUrl, setFormUrl] = useState(url || '');
     const [isLoading, setIsLoading] = useState(false);
+    const { showError, showSuccess } = useNotification();
 
     async function handleSubmit(e: FormEvent) {
         e.preventDefault();
@@ -33,10 +35,17 @@ function EditRealEstateObject({ id, name, lat, lon, curr, url, setIsEditMode }: 
         };
         try {
             await changeRealEstateObject(id, payload.name, payload.lat, payload.lon, false, payload.curr, payload.url, {});
-            alert('Об\'єкт успішно оновлено');
+            showSuccess('Об\'єкт успішно оновлено');
             setIsEditMode(false);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error updating real estate object:", error);
+            
+            // Check if the error is about duplicate name
+            if (error?.response?.data?.message === "Real Estate with this name already exists") {
+                showError('Об\'єкт з таким ім\'ям вже існує. Будь ласка, виберіть інше ім\'я.');
+            } else {
+                showError('Не вдалося оновити об\'єкт. Спробуйте ще раз пізніше.');
+            }
         } finally {
             setIsLoading(false);
         }
