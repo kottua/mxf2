@@ -134,6 +134,7 @@ function EnginePage() {
                     activeConfig={activeConfig}
                     activeObject={activeObject}
                     pricingConfig={pricingConfig}
+                    selectedEngine={selectedEngine}
                 />
             </section>
         </main>
