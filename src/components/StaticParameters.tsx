@@ -117,7 +117,7 @@ function StaticParameters({ currentConfig, setStaticConfig, incomePlans, premise
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label htmlFor="maxify_factor" className={styles.label}>Фактор максимізації</label>
+                        <label htmlFor="maxify_factor" className={styles.label}>Maxify фактор</label>
                         <input
                             type="number"
                             onChange={(e) => setMaxifyFactor(Number(e.target.value))}
@@ -140,7 +140,7 @@ function StaticParameters({ currentConfig, setStaticConfig, incomePlans, premise
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label htmlFor="minimum_liq_refusal_price" className={styles.label}>Мінімальна ціна ліквідності за м²</label>
+                        <label htmlFor="minimum_liq_refusal_price" className={styles.label}>Ціна відмови для найгіршої ліквідності за м²</label>
                         <input
                             type="number"
                             onChange={(e) => setMinimumLiqRefusalPrice(Number(e.target.value))}
@@ -153,7 +153,7 @@ function StaticParameters({ currentConfig, setStaticConfig, incomePlans, premise
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label htmlFor="maximum_liq_refusal_price" className={styles.label}>Максимальна ціна ліквідності за м²</label>
+                        <label htmlFor="maximum_liq_refusal_price" className={styles.label}>Ціна відмови найкращої ліквідності за м²</label>
                         <input
                             type="number"
                             onChange={(e) => setMaximumLiqRefusalPrice(Number(e.target.value))}
@@ -166,7 +166,7 @@ function StaticParameters({ currentConfig, setStaticConfig, incomePlans, premise
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label htmlFor="overestimate_correct_factor" className={styles.label}>Фактор корекції завищення</label>
+                        <label htmlFor="overestimate_correct_factor" className={styles.label}>Коефіціент прискорення корекції розмаху</label>
                         <input
                             type="number"
                             onChange={(e) => setOverestimateCorrectFactor(Number(e.target.value))}
@@ -178,7 +178,7 @@ function StaticParameters({ currentConfig, setStaticConfig, incomePlans, premise
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label htmlFor="oversold_method" className={styles.label}>Метод розрахунку продажів</label>
+                        <label htmlFor="oversold_method" className={styles.label}>Метод розрахунку розпроданості</label>
                         <select
                             onChange={(e) => setOversoldMethod(e.target.value as 'pieces' | 'area')}
                             id='oversold_method'
