@@ -46,7 +46,7 @@ function CreateDistributionPresetForm({ setDistributeConfig }) {
             });
         }
         if (presetName.trim() === "") {
-            alert("Будь ласка, введіть назву пресету.");
+            alert("Введіть тут назву пресету");
             return;
         }
         params["function_type"] = functionName;
