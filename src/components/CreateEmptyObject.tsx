@@ -6,7 +6,7 @@ interface CreateEmptyObjectProps {
 }
 
 function CreateEmptyObject({onCreate}: CreateEmptyObjectProps) {
-    const [name, setName] = useState("Новий об'єкт");
+    const [name, setName] = useState("Новий будинок");
 
     function handleSubmit(e: FormEvent) {
         e.preventDefault();
@@ -16,12 +16,12 @@ function CreateEmptyObject({onCreate}: CreateEmptyObjectProps) {
     return (
         <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.formGroup}>
-                <label htmlFor="name" className={styles.label}>Введіть ім'я</label>
+                <label htmlFor="name" className={styles.label}>Введіть назву</label>
                 <input
                     type="text"
                     id="name"
                     name="name"
-                    placeholder="Новий об'єкт"
+                    placeholder="Новий будинок"
                     onChange={(e) => setName(e.target.value)}
                     className={styles.input}
                 />
