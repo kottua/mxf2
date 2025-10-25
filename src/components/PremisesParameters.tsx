@@ -232,14 +232,14 @@ function PremisesParameters({ premises, selectedColumns, priorities, setPrioriti
     if (columnNames.length === 0) {
         return (
             <div className={styles.emptyState}>
-                Спочатку виберіть динамічні параметри для налаштування
+                Спочатку виберіть потрібні параметри диференціації
             </div>
         );
     }
 
     return (
         <section className={styles.section}>
-            <h2>Налаштування пріоритетів</h2>
+            <h2>Налаштування рейтингів</h2>
 
             <details className={styles.details}>
                 <summary className={styles.summary}>Збережені значення:</summary>
@@ -266,7 +266,7 @@ function PremisesParameters({ premises, selectedColumns, priorities, setPrioriti
                     <div className={styles.valuesSection}>
                         <h3>Унікальні значення для {getFieldDisplayName(selectedColumn)}</h3>
                         <p className={styles.instructions}>
-                            Оберіть значення для групування (до 3) або налаштуйте пріоритети нижче
+                            Оберіть значення для групування (до 3) або налаштуйте рейтинги нижче
                         </p>
 
                         {selectedValues.length > 0 && (
@@ -314,7 +314,7 @@ function PremisesParameters({ premises, selectedColumns, priorities, setPrioriti
                         <div className={styles.prioritiesSection}>
                             <h3>Пріоритети для {getFieldDisplayName(selectedColumn)}</h3>
                             <p className={styles.instructions}>
-                                Встановіть пріоритети (1 - найвищий)
+                                Встановіть рейтинги (1 - найвищий)
                             </p>
                             <div className={styles.prioritiesList}>
                                 {priorities[selectedColumn].map(({ name, values, priority }) => (
