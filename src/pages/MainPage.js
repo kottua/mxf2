@@ -29,7 +29,7 @@ function MainPage() {
     async function handleCreateObject(name) {
         setIsLoading(true);
         try {
-            const newObject = await createRealEstateObject(name || "Новий об'єкт");
+            const newObject = await createRealEstateObject(name || "Новий будинок");
             setObjects(prevObjects => [...prevObjects, newObject]);
             navigate('/onboarding/' + newObject.id);
         }
@@ -49,7 +49,7 @@ function MainPage() {
         }
         catch (error) {
             console.error("Error deleting real estate object:", error);
-            alert('Не вдалося видалити об\'єкт. Спробуйте ще раз пізніше.');
+            alert('Не вдалося видалити будинок. Спробуйте ще раз пізніше.');
         }
         finally {
             setIsLoading(false);
