@@ -42,7 +42,7 @@ function MainPage() {
             
             // Check if the error is about duplicate name
             if (error?.response?.data?.message === "Real Estate with this name already exists") {
-                showError('Будинок з таким ім\'ям вже існує. Будь ласка, виберіть інше ім\'я.');
+                showError('Будинок з такою назвою вже існує. Будь ласка, виберіть іншу назву.');
             } else {
                 showError('Не вдалося створити будинок. Спробуйте ще раз пізніше.');
             }
@@ -83,7 +83,7 @@ function MainPage() {
     return (
         <div className={styles.globalContainer}>
             {/*<button onClick={() => navigate('/disfact')}>*/}
-            {/*    Перейти на DisfactPage*/}
+            {/*    Перейти на сторінку налаштування пресету розподілу*/}
             {/*</button>*/}
             <main className={styles.mainContainer}>
                 <h1 className={styles.pageTitle}>Мої будинки</h1>
