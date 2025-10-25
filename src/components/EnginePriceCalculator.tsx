@@ -28,7 +28,7 @@ function EnginePriceCalculator({ realObject, selectedEngine, setCalculationProce
 
             <div className={styles.infoGrid}>
                 <div className={styles.infoItem}>
-                    <span className={styles.infoLabel}>Базовий двигун:</span>
+                    <span className={styles.infoLabel}>Базовий калькулятор:</span>
                     <span className={styles.infoValue}>{selectedEngine}</span>
                 </div>
                 {realObject && (
