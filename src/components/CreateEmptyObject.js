@@ -2,7 +2,7 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useState } from "react";
 import styles from './CreateEmptyObject.module.css';
 function CreateEmptyObject({ onCreate }) {
-    const [name, setName] = useState("Новий об'єкт");
+    const [name, setName] = useState("Новий будинок");
     function handleSubmit(e) {
         e.preventDefault();
         onCreate(name);
