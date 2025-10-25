@@ -153,7 +153,7 @@ function StaticParameters({ currentConfig, setStaticConfig, incomePlans, premise
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label htmlFor="maximum_liq_refusal_price" className={styles.label}>Ціна відмови найкращої ліквідності за м²</label>
+                        <label htmlFor="maximum_liq_refusal_price" className={styles.label}>Ціна відмови для найкращої ліквідності за м²</label>
                         <input
                             type="number"
                             onChange={(e) => setMaximumLiqRefusalPrice(Number(e.target.value))}
