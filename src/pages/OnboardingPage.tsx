@@ -42,7 +42,7 @@ function OnboardingPage() {
                     setActiveObject(response);
                 } catch (error) {
                     console.error("Error fetching real estate object:", error);
-                    alert('Не вдалося завантажити дані об\'єкта.');
+                    alert('Не вдалося завантажити дані будинку.');
                 }
             }
             if (activeObject && activeObject.premises.length > 0){
@@ -78,7 +78,7 @@ function OnboardingPage() {
             setActiveObject(newActiveObject);
         } catch (error) {
             console.error('Error saving specification data:', error);
-            alert('Не вдалося зберегти дані специфікації.');
+            alert('Не вдалося зберегти дані специфікації будинку.');
         } finally {
             setIsLoading(false);
         }
@@ -125,7 +125,7 @@ function OnboardingPage() {
     return (
         <main className={styles.main}>
             <header className={styles.header}>
-                <h1 className={styles.pageTitle}>Налаштування об'єкта</h1>
+                <h1 className={styles.pageTitle}>Налаштування будинку</h1>
                 <button onClick={handleBackBtn} className={styles.backButton}>
                     Назад
                 </button>
