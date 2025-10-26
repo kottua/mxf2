@@ -36,7 +36,7 @@ function EngineHeader({
                         onChange={handleEngineChange}
                     >
                         <option value="Regular">Regular</option>
-                        <option value="Oh, Elon">Oh, Elon</option>
+                        <option value="N/A">Oh, N/A</option>
                     </select>
                 </label>
                 <label className={styles.label}>

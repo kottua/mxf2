@@ -32,7 +32,7 @@ function OnboardingPage() {
                 }
                 catch (error) {
                     console.error("Error fetching real estate object:", error);
-                    alert('Не вдалося завантажити дані об\'єкта.');
+                    alert('Не вдалося завантажити дані будинку.');
                 }
             }
             if (activeObject && activeObject.premises.length > 0) {
@@ -59,7 +59,7 @@ function OnboardingPage() {
         }
         catch (error) {
             console.error('Error saving specification data:', error);
-            alert('Не вдалося зберегти дані специфікації.');
+            alert('Не вдалося зберегти дані специфікації будинку.');
         }
         finally {
             setIsLoading(false);

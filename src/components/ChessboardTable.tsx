@@ -78,7 +78,7 @@ function ChessboardTable({ premises, selectedMetric, staticConfig, dynamicConfig
 
     return (
         <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>Шахівниця цін</h2>
+            <h2 className={styles.sectionTitle}>Шахівниця</h2>
             <p className={styles.metricInfo}>Метрика: <strong>{selectedMetric}</strong></p>
 
             <div className={styles.tableContainer}>

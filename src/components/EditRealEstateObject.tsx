@@ -35,16 +35,16 @@ function EditRealEstateObject({ id, name, lat, lon, curr, url, setIsEditMode }: 
         };
         try {
             await changeRealEstateObject(id, payload.name, payload.lat, payload.lon, false, payload.curr, payload.url, {});
-            showSuccess('Об\'єкт успішно оновлено');
+            showSuccess('Будинок успішно оновлено');
             setIsEditMode(false);
         } catch (error: any) {
             console.error("Error updating real estate object:", error);
             
             // Check if the error is about duplicate name
             if (error?.response?.data?.message === "Real Estate with this name already exists") {
-                showError('Об\'єкт з таким ім\'ям вже існує. Будь ласка, виберіть інше ім\'я.');
+                showError('Будинок з такою назвою вже існує. Будь ласка, виберіть іншу назву.');
             } else {
-                showError('Не вдалося оновити об\'єкт. Спробуйте ще раз пізніше.');
+                showError('Не вдалося оновити будинок. Спробуйте ще раз пізніше.');
             }
         } finally {
             setIsLoading(false);
@@ -58,7 +58,7 @@ function EditRealEstateObject({ id, name, lat, lon, curr, url, setIsEditMode }: 
     return (
         <section className={styles.section}>
             <div className={styles.header}>
-                <h2>Редагування об'єкта</h2>
+                <h2>Редагування будинку</h2>
                 <p className={styles.instruction}>Для редагування внесіть необхідні значення і натисніть "зберегти"</p>
             </div>
 
@@ -71,7 +71,7 @@ function EditRealEstateObject({ id, name, lat, lon, curr, url, setIsEditMode }: 
 
             <form onSubmit={handleSubmit} className={styles.form}>
                 <div className={styles.formGroup}>
-                    <label htmlFor="name">Назва об'єкта</label>
+                    <label htmlFor="name">Назва будинку</label>
                     <input
                         type="text"
                         value={formName}
@@ -106,7 +106,7 @@ function EditRealEstateObject({ id, name, lat, lon, curr, url, setIsEditMode }: 
                 </div>
 
                 <div className={styles.formGroup}>
-                    <label htmlFor="curr">Валюта</label>
+                    <label htmlFor="curr">Валюта будинку</label>
                     <input
                         type="text"
                         value={formCurr}

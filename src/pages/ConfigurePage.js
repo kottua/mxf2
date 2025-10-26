@@ -70,7 +70,7 @@ function ConfigurePage() {
     }
     function handleGoToEngine() {
         if (!checkIsEngineReady()) {
-            alert('Будь ласка, заповніть всі параметри перед переходом до Engine');
+            alert('Будь ласка, заповніть всі параметри перед переходом до розрахунків');
             return;
         }
         navigate(`/engine/${id}`);

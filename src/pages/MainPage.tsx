@@ -34,7 +34,7 @@ function MainPage() {
     async function handleCreateObject(name: string) {
         setIsLoading(true);
         try {
-            const newObject = await createRealEstateObject(name || "Новий об'єкт");
+            const newObject = await createRealEstateObject(name || "Новий будинок");
             setObjects(prevObjects => [...prevObjects, newObject]);
             navigate('/onboarding/' + newObject.id);
         } catch (error: any) {
@@ -42,9 +42,9 @@ function MainPage() {
             
             // Check if the error is about duplicate name
             if (error?.response?.data?.message === "Real Estate with this name already exists") {
-                showError('Об\'єкт з таким ім\'ям вже існує. Будь ласка, виберіть інше ім\'я.');
+                showError('Будинок з такою назвою вже існує. Будь ласка, виберіть іншу назву.');
             } else {
-                showError('Не вдалося створити об\'єкт. Спробуйте ще раз пізніше.');
+                showError('Не вдалося створити будинок. Спробуйте ще раз пізніше.');
             }
         } finally {
             setIsLoading(false);
@@ -59,7 +59,7 @@ function MainPage() {
             setObjects(prevObjects => prevObjects.filter(obj => obj.id !== objId));
         } catch (error) {
             console.error("Error deleting real estate object:", error);
-            showError('Не вдалося видалити об\'єкт. Спробуйте ще раз пізніше.');
+            showError('Не вдалося видалити будинок. Спробуйте ще раз пізніше.');
         } finally {
             setIsLoading(false);
         }
@@ -83,23 +83,23 @@ function MainPage() {
     return (
         <div className={styles.globalContainer}>
             {/*<button onClick={() => navigate('/disfact')}>*/}
-            {/*    Перейти на DisfactPage*/}
+            {/*    Перейти на сторінку налаштування пресету розподілу*/}
             {/*</button>*/}
             <main className={styles.mainContainer}>
-                <h1 className={styles.pageTitle}>Мої об'єкти</h1>
+                <h1 className={styles.pageTitle}>Мої будинки</h1>
 
                 <section className={styles.section}>
-                    <h2>Додати новий об'єкт</h2>
+                    <h2>Додати новий будинок</h2>
                     <CreateEmptyObject
                         onCreate={handleCreateObject}
                     />
                 </section>
 
                 <section className={styles.section}>
-                    <h2>Список об'єктів</h2>
+                    <h2>Список будинків</h2>
 
                     {objects.length === 0 ? (
-                        <p className={styles.emptyState}>Об'єкти відсутні. Додайте новий.</p>
+                        <p className={styles.emptyState}>Будинки відсутні. Додайте новий.</p>
                     ) : (
                         <div className={styles.objectsGrid}>
                             {objects.map(item => (

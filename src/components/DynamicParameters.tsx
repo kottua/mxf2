@@ -92,15 +92,15 @@ function DynamicParameters({premises, currentConfig, onConfigChange}: DynamicPar
     if (availableFields.length === 0){
         return (
             <section className={styles.section}>
-                <h3>Оберіть поля для аналізу</h3>
-                <p>Немає доступних полів для аналізу. Спочатку завантажте дані специфікації.</p>
+                <h3>Оберіть фактори диференціації</h3>
+                <p>Немає даних для аналізу. Спочатку завантажте дані специфікації.</p>
             </section>
         );
     }
 
     return (
         <section className={styles.section}>
-            <h4>Оберіть поля для аналізу</h4>
+            <h4>Оберіть фактори диференціації</h4>
 
             {currentConfig && (
                 <details className={styles.currentConfig}>
@@ -125,7 +125,7 @@ function DynamicParameters({premises, currentConfig, onConfigChange}: DynamicPar
 
             {selectedFields.length > 0 && (
                 <div className={styles.weightsSection}>
-                    <h4>Налаштування ваг полів</h4>
+                    <h4>Налаштування ваги факторів диференціації</h4>
                     <div className={styles.totalWeight}>
                         Загальна вага: {(totalWeight * 100).toFixed(1)}%
                     </div>
