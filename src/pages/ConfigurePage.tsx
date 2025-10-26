@@ -27,6 +27,26 @@ function ConfigurePage() {
     const [showDistribForm, setShowDistribForm] = useState(false); // State to toggle form visibility
     const navigate = useNavigate();
 
+    // Загрузка настроек дистрибуции при каждом переходе на страницу
+    useEffect(() => {
+        async function getDistributionConfigs() {
+            try {
+                const response = await fetchDistributionConfigs();
+                setDistribConfigs(response);
+                if (response.length > 0 && !activeDistribConfig) {
+                    setActiveDistribConfig(response[0]);
+                }
+            } catch (error) {
+                console.error("Error fetching distribution configs:", error);
+            }
+        }
+
+        setDistribConfigs([]);
+        setActiveDistribConfig(null);
+        
+        getDistributionConfigs();
+    }, [id]);
+
     useEffect(() => {
         async function fetchData() {
             try {
@@ -57,34 +77,18 @@ function ConfigurePage() {
             }
         }
 
-        async function getDistributionConfigs() {
-            try {
-                const response = await fetchDistributionConfigs();
-                setDistribConfigs(response);
-                if (response.length > 0 && !activeDistribConfig) {
-                    setActiveDistribConfig(response[0]);
-                }
-            } catch (error) {
-                console.error("Error fetching distribution configs:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        }
-
         if (activeObject && activeObject.id === Number(id)) {
             if (activeObject.pricing_configs.length === 0) {
                 setIsLoading(false);
                 return;
             }
             getPricingConfig();
-            getDistributionConfigs();
             return;
         }
 
         fetchData();
         getPricingConfig();
-        getDistributionConfigs();
-    }, [activeObject, id, setActiveObject, setIsLoading]);
+    }, [activeObject, id, setActiveObject, setIsLoading, distribConfigs]);
 
     function handleBackBtn() {
         navigate(-1);
