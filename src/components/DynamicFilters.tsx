@@ -2,15 +2,15 @@ import type {Premises} from "../interfaces/Premises.ts";
 import {useEffect, useState} from "react";
 import type {DynamicParametersConfig} from "../interfaces/DynamicParametersConfig.ts";
 import {getFieldDisplayName} from "../constants/fieldTranslations.ts";
-import styles from "./DynamicParameters.module.css";
+import styles from "./DynamicFilters.module.css";
 
-interface DynamicParametersProps {
+interface DynamicFiltersProps {
     premises: Premises[];
     currentConfig: DynamicParametersConfig | null;
     onConfigChange: (config: DynamicParametersConfig) => void;
 }
 
-function DynamicParameters({premises, currentConfig, onConfigChange}: DynamicParametersProps) {
+function DynamicFilters({premises, currentConfig, onConfigChange}: DynamicFiltersProps) {
     const [config, setConfig] = useState<DynamicParametersConfig>({
         importantFields: {},
         weights: {},
@@ -29,7 +29,6 @@ function DynamicParameters({premises, currentConfig, onConfigChange}: DynamicPar
             key !== 'id' && key !== 'reo_id' && key !== "uploaded" && key !== "customcontent"
         );
 
-        // Отримуємо всі унікальні ключі з customcontent з усіх premises
         const customContentKeys = new Set<string>();
         premises.forEach(premise => {
             if (premise.customcontent && typeof premise.customcontent === 'object') {
@@ -91,46 +90,42 @@ function DynamicParameters({premises, currentConfig, onConfigChange}: DynamicPar
 
     if (availableFields.length === 0){
         return (
-            <section className={styles.section}>
-                <h3>Оберіть фактори диференціації</h3>
-                <p>Немає даних для аналізу. Спочатку завантажте дані специфікації.</p>
-            </section>
+            <div className={styles.filtersContainer}>
+                <h3 className={styles.filtersTitle}>Фільтри</h3>
+                <p className={styles.noData}>Немає даних для аналізу.</p>
+            </div>
         );
     }
 
     return (
-        <section className={styles.section}>
-            <h4>Оберіть фактори диференціації</h4>
-
-            {currentConfig && (
-                <details className={styles.currentConfig}>
-                    <summary>Поточні динамічні параметри ↓</summary>
-                    <pre>{JSON.stringify(currentConfig, null, 2)}</pre>
-                </details>
-            )}
-
-            <div className={styles.fieldsGrid}>
-                {availableFields.map(field => (
-                    <label key={field} className={styles.fieldLabel}>
-                        <input
-                            type="checkbox"
-                            checked={!!config.importantFields[field]}
-                            onChange={() => handleFieldToggle(field)}
-                            id={`${field}_box`}
-                        />
-                        <span>{getFieldDisplayName(field)}</span>
-                    </label>
-                ))}
+        <div className={styles.filtersContainer}>
+            <h3 className={styles.filtersTitle}>Фільтри</h3>
+            
+            <div className={styles.filtersSection}>
+                <h4 className={styles.sectionTitle}>Фактори диференціації</h4>
+                <div className={styles.fieldsList}>
+                    {availableFields.map(field => (
+                        <label key={field} className={styles.fieldLabel}>
+                            <input
+                                type="checkbox"
+                                checked={!!config.importantFields[field]}
+                                onChange={() => handleFieldToggle(field)}
+                                className={styles.checkbox}
+                            />
+                            <span className={styles.fieldName}>{getFieldDisplayName(field)}</span>
+                        </label>
+                    ))}
+                </div>
             </div>
 
             {selectedFields.length > 0 && (
                 <div className={styles.weightsSection}>
-                    <h4>Налаштування ваги факторів диференціації</h4>
+                    <h4 className={styles.sectionTitle}>Ваги факторів</h4>
                     <div className={styles.totalWeight}>
                         Загальна вага: {(totalWeight * 100).toFixed(1)}%
                     </div>
 
-                    <div className={styles.weightsGrid}>
+                    <div className={styles.weightsList}>
                         {selectedFields.map(field => (
                             <div key={field} className={styles.weightItem}>
                                 <div className={styles.weightHeader}>
@@ -142,7 +137,6 @@ function DynamicParameters({premises, currentConfig, onConfigChange}: DynamicPar
 
                                 <div className={styles.sliderContainer}>
                                     <input
-                                        id={`${field}_slider`}
                                         type="range"
                                         min="0"
                                         max="100"
@@ -151,17 +145,14 @@ function DynamicParameters({premises, currentConfig, onConfigChange}: DynamicPar
                                         onChange={(e) => handleWeightChange(field, Number(e.target.value) / 100)}
                                         className={styles.slider}
                                     />
-                                    <span className={styles.sliderPercentage}>
-                                        {((config.weights[field] || 0) * 100).toFixed(0)}%
-                                    </span>
                                 </div>
                             </div>
                         ))}
                     </div>
                 </div>
             )}
-        </section>
+        </div>
     );
 }
 
-export default DynamicParameters;
+export default DynamicFilters;

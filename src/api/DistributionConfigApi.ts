@@ -19,3 +19,8 @@ export async function fetchDistributionConfig(id: number){
     const {data} = await api.get<DistributionConfig>(`/distribution-configs/${id}/`);
     return data;
 }
+
+export async function deleteDistributionConfig(id: number){
+    const {data} = await api.delete(`/distribution-configs/${id}/`);
+    return data;
+}

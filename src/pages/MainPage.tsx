@@ -82,9 +82,6 @@ function MainPage() {
 
     return (
         <div className={styles.globalContainer}>
-            {/*<button onClick={() => navigate('/disfact')}>*/}
-            {/*    Перейти на сторінку налаштування пресету розподілу*/}
-            {/*</button>*/}
             <main className={styles.mainContainer}>
                 <h1 className={styles.pageTitle}>Мої будинки</h1>
 

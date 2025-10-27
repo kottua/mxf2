@@ -1,4 +1,5 @@
 import React from 'react';
+import styles from './DistributionDynamicParams.module.css';
 
 interface DistributionDynamicParamsProps {
     functionName: string;
@@ -53,24 +54,30 @@ function DistributionDynamicParams({ functionName }: DistributionDynamicParamsPr
     }
 
     return (
-        <>
+        <div className={styles.paramsContainer}>
             {Object.entries(selectedFunction.params).map(([paramName, paramDetails]) => (
-                <p key={paramName}>
-                    <label htmlFor={paramName}>
+                <div key={paramName} className={styles.paramGroup}>
+                    <label htmlFor={paramName} className={styles.paramLabel}>
                         {paramName}:
                     </label>
-                    <input
-                        type="number"
-                        id={paramName}
-                        name={paramName}
-                        defaultValue={paramDetails.default}
-                        min={paramDetails.min}
-                        max={paramDetails.max}
-                        step="0.01"
-                    />
-                </p>
+                    <div className={styles.inputContainer}>
+                        <input
+                            type="number"
+                            id={paramName}
+                            name={paramName}
+                            defaultValue={paramDetails.default}
+                            min={paramDetails.min}
+                            max={paramDetails.max}
+                            step="0.01"
+                            className={styles.paramInput}
+                        />
+                        <div className={styles.paramRange}>
+                            {paramDetails.min} - {paramDetails.max}
+                        </div>
+                    </div>
+                </div>
             ))}
-        </>
+        </div>
     );
 }
 

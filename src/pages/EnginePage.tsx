@@ -129,12 +129,10 @@ function EnginePage() {
             </section>
 
             <section className={styles.section}>
-                <h1>Ця частина сторінки і результати з'являються при рендері сторінки. Нічого робити не потрібно. Для простоти береться останній збережений конфіг.</h1>
                 <ShowCalculationProcessTable
                     activeConfig={activeConfig}
                     activeObject={activeObject}
                     pricingConfig={pricingConfig}
-                    selectedEngine={selectedEngine}
                 />
             </section>
         </main>

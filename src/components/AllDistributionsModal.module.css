@@ -1,0 +1,322 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.modal {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    width: 100%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow: hidden;
+    animation: modalSlideIn 0.2s ease-out;
+    display: flex;
+    flex-direction: column;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb;
+}
+
+.modalTitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+}
+
+.closeButton {
+    background: #f3f4f6;
+    border: 2px solid #e5e7eb;
+    font-size: 1rem;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.closeButton:hover {
+    background: #fee2e2;
+    border-color: #fecaca;
+    color: #dc2626;
+    transform: scale(1.05);
+}
+
+.modalContent {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+}
+
+.statsBar {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.totalCount {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.distributionsList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1rem;
+}
+
+.emptyState {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6b7280;
+}
+
+.emptyIcon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.emptyText {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+.distributionCard {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 1.25rem;
+    transition: all 0.2s ease;
+}
+
+.distributionCard:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.cardHeader {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.cardIcon {
+    font-size: 1.5rem;
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    flex-shrink: 0;
+}
+
+.cardInfo {
+    flex: 1;
+    min-width: 0;
+}
+
+.cardName {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 0.25rem 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cardType {
+    font-size: 0.85rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.cardActions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+.cardId {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    font-weight: 500;
+    background: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #e5e7eb;
+}
+
+.deleteButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    font-size: 1rem;
+}
+
+.deleteButton:hover {
+    background: #fee2e2;
+    transform: scale(1.1);
+}
+
+.cardContent {
+    margin-top: 0.75rem;
+}
+
+.cardParams {
+    font-size: 0.85rem;
+    color: #4b5563;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    background: white;
+    padding: 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    word-break: break-all;
+    line-height: 1.4;
+}
+
+.modalFooter {
+    padding: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    background: #f9fafb;
+    display: flex;
+    justify-content: center;
+}
+
+.closeFooterButton {
+    padding: 0.875rem 2rem;
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    letter-spacing: 0.025em;
+}
+
+.closeFooterButton:hover {
+    background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 768px) {
+    .modalOverlay {
+        padding: 0.5rem;
+    }
+    
+    .modal {
+        max-width: 100%;
+        max-height: 95vh;
+    }
+    
+    .modalHeader {
+        padding: 1rem;
+    }
+    
+    .modalTitle {
+        font-size: 1.25rem;
+    }
+    
+    .modalContent {
+        padding: 1rem;
+    }
+    
+    .distributionsList {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .distributionCard {
+        padding: 1rem;
+    }
+    
+    .cardHeader {
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .cardIcon {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1.25rem;
+    }
+    
+    .cardName {
+        font-size: 0.9rem;
+    }
+    
+    .cardType {
+        font-size: 0.8rem;
+    }
+    
+    .cardParams {
+        font-size: 0.8rem;
+        padding: 0.5rem;
+    }
+    
+    .modalFooter {
+        padding: 1rem;
+    }
+    
+    .closeFooterButton {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.85rem;
+    }
+}

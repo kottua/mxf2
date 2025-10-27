@@ -2,8 +2,9 @@
 
 .globalContainer {
     box-sizing: border-box;
-    margin-left: 15%;
-    margin-right: 15%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
     font-family: 'Inter', 'Segoe UI', 'Roboto', -apple-system, sans-serif;
 }
 
