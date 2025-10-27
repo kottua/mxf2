@@ -2,23 +2,26 @@
 
 body {
     background-color: #f9fafb;
+    margin: 0;
+    padding: 0;
 }
 
 .globalContainer {
     box-sizing: border-box;
-    margin-left: 15%;
-    margin-right: 15%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    min-height: 100vh;
 }
 
 @media (max-width: 768px) {
     .globalContainer {
-        margin-left: 10%;
-        margin-right: 10%;
+        padding: 0 1rem;
     }
 }
+
 @media (max-width: 480px) {
     .globalContainer {
-        margin-left: 3%;
-        margin-right: 3%;
+        padding: 0 0.5rem;
     }
 }

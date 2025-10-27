@@ -1,7 +1,7 @@
 import {useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {fetchRealEstateObject} from "../api/RealEstateObjectApi.ts";
-import EditRealEstateObject from "../components/EditRealEstateObject.tsx";
+import BuildingInfo from "../components/BuildingInfo.tsx";
 import UploadSpecificationFile from "../components/UploadSpecificationFile.tsx";
 import type {RealEstateObjectData} from "../interfaces/RealEstateObjectData.ts";
 import { updatePremisesBulk } from "../api/PremisesApi.ts";
@@ -21,8 +21,6 @@ function OnboardingPage() {
     const { id } = useParams();
     const navigate = useNavigate();
     const {activeObject, setActiveObject, isLoading, setIsLoading} = useActiveRealEstateObject();
-
-    const [isEditMode, setIsEditMode] = useState(false);
 
     const [isSpecPreview, setIsSpecPreview] = useState(false);
     const [previewSpecData, setPreviewSpecData] = useState<RealEstateObjectData[]>([]);
@@ -126,64 +124,73 @@ function OnboardingPage() {
         <main className={styles.main}>
             <header className={styles.header}>
                 <h1 className={styles.pageTitle}>Налаштування будинку</h1>
-                <button onClick={handleBackBtn} className={styles.backButton}>
-                    Назад
-                </button>
+                <div className={styles.headerButtons}>
+                    <button
+                        onClick={saveSpecificationData} 
+                        className={styles.saveButton}
+                        disabled={!previewSpecData || previewSpecData.length === 0 || !previewSpecData.some(item => item && typeof item === 'object' && Object.keys(item).length > 0)}
+                    >
+                        Зберегти специфікацію
+                    </button>
+                    <button
+                        onClick={saveIncomePlanData} 
+                        className={styles.saveButton}
+                        disabled={!previewIncomeData || previewIncomeData.length === 0}
+                    >
+                        Зберегти план доходів
+                    </button>
+                    <button
+                        onClick={() => navigate("/configure/" + activeObject.id)}
+                        className={styles.navButton}
+                    >
+                        Перейти до конфігурації
+                    </button>
+                    <button onClick={handleBackBtn} className={styles.backButton}>
+                        Назад
+                    </button>
+                </div>
             </header>
 
-            {/* Edit Object Section */}
+            {/* Building Information Section */}
             <section className={styles.section}>
-                {isEditMode ? (
-                    <EditRealEstateObject {...activeObject} setIsEditMode={setIsEditMode} />
-                ) : (
-                    <div className={styles.objectHeader}>
-                        <h2 className={styles.objectName}>{activeObject?.name}</h2>
-                        <button
-                            onClick={() => setIsEditMode(true)}
-                            className={styles.editButton}
-                        >
-                            Редагувати
-                        </button>
-                    </div>
-                )}
-            </section>
-
-            {/* Upload Specification Section */}
-            <section className={styles.section}>
-                <UploadSpecificationFile
-                    isPreview={isSpecPreview}
-                    setIsPreview={setIsSpecPreview}
-                    previewSpecData={previewSpecData}
-                    setPreviewSpecData={setPreviewSpecData}
+                <BuildingInfo
+                    id={activeObject.id}
+                    name={activeObject.name}
+                    lat={activeObject.lat}
+                    lon={activeObject.lon}
+                    curr={activeObject.curr}
+                    url={activeObject.url}
+                    is_deleted={activeObject.is_deleted}
+                    custom_fields={activeObject.custom_fields}
+                    onUpdate={() => {
+                        // Refresh the active object data
+                        fetchRealEstateObject(activeObject.id).then(setActiveObject);
+                    }}
                 />
-                <button 
-                    onClick={saveSpecificationData} 
-                    className={styles.saveButton} 
-                    disabled={!previewSpecData || previewSpecData.length === 0 || !previewSpecData.some(item => item && typeof item === 'object' && Object.keys(item).length > 0)}
-                >
-                    Зберегти дані специфікації
-                </button>
             </section>
 
-            {/* Upload Income Plans Section */}
-            <section className={styles.section}>
-                <UploadIncomeFile
-                    isPreview={isIncomePreview}
-                    previewIncomeData={previewIncomeData}
-                    setIsPreview={setIsIncomePreview}
-                    setPreviewIncomeData={setPreviewIncomeData}
-                />
-                <button onClick={saveIncomePlanData} className={styles.saveButton}>
-                    Зберегти дані плану доходів
-                </button>
-            </section>
+            {/* Upload Sections - Horizontal Layout */}
+            <div className={styles.uploadSections}>
+                {/* Upload Specification Section */}
+                <section className={styles.uploadSection}>
+                    <UploadSpecificationFile
+                        isPreview={isSpecPreview}
+                        setIsPreview={setIsSpecPreview}
+                        previewSpecData={previewSpecData}
+                        setPreviewSpecData={setPreviewSpecData}
+                    />
+                </section>
 
-            <button
-                onClick={() => navigate("/configure/" + activeObject.id)}
-                className={styles.navButton}
-            >
-                Перейти до конфігурації
-            </button>
+                {/* Upload Income Plans Section */}
+                <section className={styles.uploadSection}>
+                    <UploadIncomeFile
+                        isPreview={isIncomePreview}
+                        previewIncomeData={previewIncomeData}
+                        setIsPreview={setIsIncomePreview}
+                        setPreviewIncomeData={setPreviewIncomeData}
+                    />
+                </section>
+            </div>
         </main>
     );
 }

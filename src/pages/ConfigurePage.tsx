@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { fetchRealEstateObject } from "../api/RealEstateObjectApi.ts";
 import { useNavigate, useParams } from "react-router-dom";
 import { createPricingConfig, fetchPricingConfig } from "../api/PricingConfigApi.ts";
-import DynamicParameters from "../components/DynamicParameters.tsx";
-import StaticParameters from "../components/StaticParameters.tsx";
+import DynamicFilters from "../components/DynamicFilters.tsx";
+import StaticParametersPanel from "../components/StaticParametersPanel.tsx";
 import type { StaticParametersConfig } from "../interfaces/StaticParameters.ts";
 import { getDynamicFromPricingConfig, getStaticFromPricingConfig } from "../core/Parsers.ts";
 import type { DynamicParametersConfig } from "../interfaces/DynamicParametersConfig.ts";
@@ -13,7 +13,7 @@ import { useActiveRealEstateObject } from "../contexts/ActiveRealEstateObjectCon
 import styles from "./ConfigurePage.module.css";
 import type { DistributionConfig } from "../interfaces/DistributionConfig.ts";
 import { fetchDistributionConfigs } from "../api/DistributionConfigApi.ts";
-import CreateDistributionPresetForm from "../components/CreateDistributionPresetForm.tsx";
+import DistributionManager from "../components/DistributionManager.tsx";
 
 function ConfigurePage() {
     const { id } = useParams();
@@ -24,7 +24,6 @@ function ConfigurePage() {
     const [distribConfigs, setDistribConfigs] = useState<DistributionConfig[]>([]);
     const [activeDistribConfig, setActiveDistribConfig] = useState<DistributionConfig | null>(null);
     const [priorities, setPriorities] = useState<ColumnPriorities>({});
-    const [showDistribForm, setShowDistribForm] = useState(false); // State to toggle form visibility
     const navigate = useNavigate();
 
     // Загрузка настроек дистрибуции при каждом переходе на страницу
@@ -107,10 +106,37 @@ function ConfigurePage() {
     }
 
     async function handleSaveConfig() {
-        if (!dynamicConfig || !staticConfig) {
-            alert("Будь ласка, заповніть всі параметри");
+        // Сначала проверяем, что все необходимые данные заполнены
+        if (!dynamicConfig) {
+            alert("Будь ласка, заповніть динамічні параметри");
             return;
         }
+        
+        // Получаем актуальные данные статичных параметров из формы
+        const staticForm = document.querySelector('form') as HTMLFormElement;
+        if (!staticForm) {
+            alert("Не знайдено форму статичних параметрів");
+            return;
+        }
+        
+        // Собираем данные из формы статичных параметров
+        const formData = new FormData(staticForm);
+        const staticConfigData: StaticParametersConfig = {
+            bargainGap: Number(formData.get('negotiation_discount')) || 0,
+            maxify_factor: Number(formData.get('maxify_factor')) || 0,
+            current_price_per_sqm: Number(formData.get('current_price_per_sqm')) || 0,
+            minimum_liq_refusal_price: Number(formData.get('minimum_liq_refusal_price')) || 0,
+            maximum_liq_refusal_price: Number(formData.get('maximum_liq_refusal_price')) || 0,
+            overestimate_correct_factor: Number(formData.get('overestimate_correct_factor')) || 0,
+            oversold_method: (formData.get('oversold_method') as "pieces" | "area") || "pieces",
+            sigma: Number(formData.get('sigma')) || 0,
+            similarityThreshold: Number(formData.get('similarityThreshold')) || 0,
+            distribConfigId: Number(formData.get('distributionConfig')) || null
+        };
+        
+        // Обновляем локальное состояние статичных параметров
+        setStaticConfig(staticConfigData);
+        
         setIsLoading(true);
         try {
             const configToSave: PricingConfig = {
@@ -118,7 +144,7 @@ function ConfigurePage() {
                 is_active: true,
                 reo_id: Number(id),
                 content: {
-                    staticConfig,
+                    staticConfig: staticConfigData,
                     dynamicConfig,
                     ranging: priorities || {},
                 },
@@ -150,83 +176,56 @@ function ConfigurePage() {
     return (
         <main className={styles.main}>
             <header className={styles.header}>
-                <h1 className={styles.pageTitle}>Конфігурація</h1>
-                <button onClick={handleBackBtn} className={styles.backButton}>
-                    Назад
-                </button>
+                <h1 className={styles.pageTitle}>Конфігурація ціноутворення</h1>
+                <div className={styles.headerButtons}>
+                    <button onClick={handleSaveConfig} className={styles.saveButton}>
+                        Зберегти конфігурацію
+                    </button>
+                    <button onClick={handleGoToEngine} className={styles.navButton}>
+                        Перейти до Engine
+                    </button>
+                    <button onClick={handleBackBtn} className={styles.backButton}>
+                        Назад
+                    </button>
+                </div>
             </header>
 
-            <p className={styles.objectInfo}>
-                Конфігурація для об'єкта: <strong>{activeObject?.name}</strong>
-            </p>
-
-            <section className={styles.section}>
-                <h2>Динамічні параметри</h2>
-                <DynamicParameters
-                    premises={activeObject.premises}
-                    currentConfig={dynamicConfig}
-                    onConfigChange={setDynamicConfig}
-                />
-            </section>
-
-            {dynamicConfig?.importantFields && (
-                <section className={styles.section}>
-                    <h2>Пріоритети параметрів</h2>
-                    <PremisesParameters
+            <div className={styles.contentLayout}>
+                <div className={styles.filtersColumn}>
+                    <DynamicFilters
                         premises={activeObject.premises}
-                        selectedColumns={dynamicConfig?.importantFields}
-                        setPriorities={setPriorities}
-                        priorities={priorities}
+                        currentConfig={dynamicConfig}
+                        onConfigChange={setDynamicConfig}
                     />
-                </section>
-            )}
+                </div>
 
-            <section className={styles.section}>
-                <h2>Статичні параметри</h2>
-                <StaticParameters
-                    currentConfig={staticConfig}
-                    setStaticConfig={setStaticConfig}
-                    incomePlans={activeObject.income_plans || []}
-                    premises={activeObject.premises || []}
-                    distribConfigs={distribConfigs}
-                />
-            </section>
+                <div className={styles.mainContent}>
+                    {dynamicConfig?.importantFields && (
+                        <section className={styles.section}>
+                            <h2>Пріоритети параметрів</h2>
+                            <PremisesParameters
+                                premises={activeObject.premises}
+                                selectedColumns={dynamicConfig?.importantFields}
+                                setPriorities={setPriorities}
+                                priorities={priorities}
+                            />
+                        </section>
+                    )}
+                </div>
 
-            <section className={styles.section}>
-                <h2>Налаштування дистрибуції</h2>
-                <button
-                    onClick={() => setShowDistribForm(!showDistribForm)}
-                    className={styles.navButton}
-                >
-                    {showDistribForm ? "Приховати форму" : "+ Додати дистрибуцію"}
-                </button>
-
-                {showDistribForm && (
-                    <CreateDistributionPresetForm setDistributeConfig={setDistribConfigs} />
-                )}
-
-                <h3>Доступні конфіги</h3>
-                {distribConfigs.length === 0 ? (
-                    <p>Немає збережених дистрибуцій.</p>
-                ) : (
-                    <ul>
-                        {distribConfigs.map((config) => (
-                            <li key={config.id}>
-                                <strong>{config.func_name || `Config ${config.id}`}</strong> - ID: {config.id} - Content:{" "}
-                                {JSON.stringify(config.content)}
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </section>
-
-            <div className={styles.actions}>
-                <button onClick={handleSaveConfig} className={styles.saveButton}>
-                    Зберегти конфігурацію
-                </button>
-                <button onClick={handleGoToEngine} className={styles.navButton}>
-                    Перейти до Engine
-                </button>
+                <div className={styles.staticColumn}>
+                    <DistributionManager
+                        distribConfigs={distribConfigs}
+                        setDistribConfigs={setDistribConfigs}
+                    />
+                    <StaticParametersPanel
+                        currentConfig={staticConfig}
+                        setStaticConfig={setStaticConfig}
+                        incomePlans={activeObject.income_plans || []}
+                        premises={activeObject.premises || []}
+                        distribConfigs={distribConfigs}
+                    />
+                </div>
             </div>
         </main>
     );

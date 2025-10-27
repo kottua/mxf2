@@ -2,9 +2,10 @@
 
 .main {
     padding: 2rem;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     font-family: 'Inter', sans-serif;
+    box-sizing: border-box;
 }
 
 .header {
@@ -16,6 +17,13 @@
     border-bottom: 2px solid #e5e7eb;
 }
 
+.headerButtons {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
 .pageTitle {
     font-size: 2.5rem;
     font-weight: 300;
@@ -24,15 +32,17 @@
 }
 
 .backButton {
-    padding: 0.75rem 1.5rem;
+    padding: 0.75rem 1.25rem;
     background: #6b7280;
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .backButton:hover {
@@ -46,6 +56,25 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     border: 1px solid #e2e8f0;
     margin-bottom: 2rem;
+}
+
+.uploadSections {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.uploadSection {
+    background: white;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    max-height: 95vh;
+    overflow: hidden;
 }
 
 .objectHeader {
@@ -79,16 +108,17 @@
 }
 
 .saveButton {
-    padding: 0.75rem 1.5rem;
+    padding: 0.75rem 1.25rem;
     background: #10b981;
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
     transition: background-color 0.2s ease;
-    margin-top: 1rem;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .saveButton:hover {
@@ -101,19 +131,17 @@
 }
 
 .navButton {
-    padding: 1rem 2rem;
+    padding: 0.75rem 1.25rem;
     background: #3b82f6;
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    margin-top: 2rem;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .navButton:hover {
@@ -129,6 +157,24 @@
 }
 
 /* Responsive design */
+@media (max-width: 1024px) {
+    .uploadSections {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .headerButtons {
+        gap: 0.5rem;
+    }
+
+    .saveButton,
+    .navButton,
+    .backButton {
+        padding: 0.625rem 1rem;
+        font-size: 0.85rem;
+    }
+}
+
 @media (max-width: 768px) {
     .main {
         padding: 1rem;
@@ -140,11 +186,34 @@
         text-align: center;
     }
 
+    .headerButtons {
+        flex-direction: column;
+        gap: 0.75rem;
+        width: 100%;
+    }
+
+    .saveButton,
+    .navButton,
+    .backButton {
+        width: 100%;
+        padding: 0.875rem;
+        font-size: 0.9rem;
+    }
+
     .pageTitle {
         font-size: 2rem;
     }
 
     .section {
+        padding: 1.5rem;
+    }
+
+    .uploadSections {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .uploadSection {
         padding: 1.5rem;
     }
 
@@ -154,18 +223,24 @@
         gap: 0.5rem;
     }
 
-    .navButton {
+    .saveButton,
+    .navButton,
+    .backButton {
         width: 100%;
         padding: 0.875rem;
     }
 }
 
 @media (max-width: 480px) {
-    .pageTitle {
-        font-size: 1.75rem;
+    .main {
+        padding: 0.5rem;
     }
 
-    .section {
+    .uploadSections {
+        gap: 1rem;
+    }
+
+    .uploadSection {
         padding: 1.25rem;
     }
 
@@ -177,4 +252,13 @@
         width: 100%;
         padding: 1rem;
     }
+
+    .navButton {
+        padding: 1rem;
+    }
+}
+
+.uploadSection .saveButton {
+    margin-top: auto;
+    margin-bottom: 0;
 }

@@ -2,18 +2,19 @@
 
 .main {
     padding: 2rem;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     font-family: 'Inter', sans-serif;
+    box-sizing: border-box;
 }
 
 .header {
     display: flex;
+    justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
     padding-bottom: 1.5rem;
     border-bottom: 2px solid #e5e7eb;
-    gap: 2rem;
 }
 
 .pageTitle {
@@ -21,32 +22,38 @@
     font-weight: 300;
     color: #1f2937;
     margin: 0;
-    text-align: center;
-    flex: 1;
 }
 
-.backButton {
-    padding: 0.75rem 1.5rem;
-    background: #6b7280;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    order: 1;
+.headerButtons {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
-.backButton:hover {
-    background: #4b5563;
+
+
+.contentLayout {
+    display: grid;
+    grid-template-columns: 300px 1fr 350px;
+    gap: 2rem;
+    align-items: start;
 }
 
-.objectInfo {
-    text-align: center;
-    margin-bottom: 2rem;
-    color: #64748b;
-    font-size: 1.1rem;
+.filtersColumn {
+    position: sticky;
+    top: 2rem;
+}
+
+.mainContent {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.staticColumn {
+    position: sticky;
+    top: 2rem;
 }
 
 .section {
@@ -75,37 +82,57 @@
 }
 
 .saveButton {
-    padding: 1rem 2rem;
+    padding: 0.75rem 1.25rem;
     background: #10b981;
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .saveButton:hover {
     background: #059669;
-    transform: translateY(-1px);
+}
+
+.backButton {
+    padding: 0.75rem 1.25rem;
+    background: #6b7280;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.backButton:hover {
+    background: #4b5563;
 }
 
 .navButton {
-    padding: 1rem 2rem;
+    padding: 0.75rem 1.25rem;
     background: #3b82f6;
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .navButton:hover {
     background: #2563eb;
-    transform: translateY(-1px);
 }
 
 .loading {
@@ -120,11 +147,31 @@
     .main {
         padding: 1.5rem;
     }
+    
+    .contentLayout {
+        grid-template-columns: 280px 1fr 320px;
+        gap: 1.5rem;
+    }
 }
 
 @media (max-width: 768px) {
     .main {
         padding: 1rem;
+    }
+
+    .contentLayout {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .filtersColumn {
+        position: static;
+        order: -2;
+    }
+    
+    .staticColumn {
+        position: static;
+        order: -1;
     }
 
     .header {
@@ -133,14 +180,22 @@
         text-align: center;
     }
 
-    .pageTitle {
-        font-size: 2rem;
-        order: -2;
+    .headerButtons {
+        flex-direction: column;
+        gap: 0.75rem;
+        width: 100%;
     }
 
+    .saveButton,
+    .navButton,
     .backButton {
-        order: -1;
-        align-self: center;
+        width: 100%;
+        padding: 0.875rem;
+        font-size: 0.9rem;
+    }
+
+    .pageTitle {
+        font-size: 2rem;
     }
 
     .section {
@@ -152,9 +207,6 @@
         font-size: 1.3rem;
     }
 
-    .objectInfo {
-        font-size: 1rem;
-    }
 
     .actions {
         flex-direction: column;
@@ -170,10 +222,10 @@
 }
 
 @media (max-width: 480px) {
-    .pageTitle {
-        font-size: 1.75rem;
+    .main {
+        padding: 0.5rem;
     }
-
+    
     .section {
         padding: 1.25rem;
     }
@@ -185,10 +237,6 @@
     .backButton {
         padding: 0.625rem 1.25rem;
         font-size: 0.9rem;
-    }
-
-    .objectInfo {
-        font-size: 0.95rem;
     }
 }
 
