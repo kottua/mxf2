@@ -16,8 +16,10 @@ import type {IncomePlanData} from "../interfaces/IncomePlanData.ts";
 import { updateIncomePlanBulk } from "../api/IncomePlanApi.ts";
 import {useActiveRealEstateObject} from "../contexts/ActiveRealEstateObjectContext.tsx";
 import styles from './OnBoardingPage.module.css';
+import {useNotification} from "../hooks/useNotification.ts";
 
 function OnboardingPage() {
+    const { showError } = useNotification();
     const { id } = useParams();
     const navigate = useNavigate();
     const {activeObject, setActiveObject, isLoading, setIsLoading} = useActiveRealEstateObject();
@@ -40,7 +42,7 @@ function OnboardingPage() {
                     setActiveObject(response);
                 } catch (error) {
                     console.error("Error fetching real estate object:", error);
-                    alert('Не вдалося завантажити дані будинку.');
+                    showError('Не вдалося завантажити дані будинку.');
                 }
             }
             if (activeObject && activeObject.premises.length > 0){
@@ -66,7 +68,7 @@ function OnboardingPage() {
             );
             
             if (validData.length === 0) {
-                alert('Немає валідних даних для збереження.');
+                showError('Немає валідних даних для збереження.');
                 return;
             }
             
@@ -76,7 +78,7 @@ function OnboardingPage() {
             setActiveObject(newActiveObject);
         } catch (error) {
             console.error('Error saving specification data:', error);
-            alert('Не вдалося зберегти дані специфікації будинку.');
+            showError('Не вдалося зберегти дані специфікації будинку.');
         } finally {
             setIsLoading(false);
         }
@@ -101,8 +103,7 @@ function OnboardingPage() {
             setActiveObject(newActiveObject);
         } catch (error) {
             console.error('Error saving income plan data:', error);
-            console.error('Error response:', error.response?.data);
-            alert('Не вдалося зберегти дані плану доходів.');
+            showError('Не вдалося зберегти дані плану доходів.');
         } finally {
             setIsLoading(false);
         }

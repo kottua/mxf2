@@ -1,8 +1,10 @@
 import {useState, useEffect} from "react";
 import {calculateScoringByIds} from "../api/ScoringApi.ts";
+import {saveCommittedPrices, type CommittedPricesItem, type BulkCommittedPricesRequest} from "../api/CommittedPricesApi.ts";
 import type {DistributionConfig} from "../interfaces/DistributionConfig.ts";
 import type {RealEstateObject} from "../interfaces/RealEstateObject.ts";
 import type {PricingConfig} from "../interfaces/PricingConfig.ts";
+import {useNotification} from "../hooks/useNotification.ts";
 
 interface SelectViewFromDataFrameProps {
     activeConfig: DistributionConfig;
@@ -11,11 +13,13 @@ interface SelectViewFromDataFrameProps {
 }
 
 function ShowCalculationProcessTable({activeConfig, activeObject, pricingConfig}: SelectViewFromDataFrameProps) {
+    const { showError, showSuccess } = useNotification();
     const [scoringLoading, setScoringLoading] = useState(false);
     const [scoringError, setScoringError] = useState<string | null>(null);
     const [scoringData, setScoringData] = useState<any>(null);
+    const [saveLoading, setSaveLoading] = useState(false);
+    const [saveError, setSaveError] = useState<string | null>(null);
 
-    // Функция для получения данных с бэкенда
     const fetchCalculationData = async () => {
         if (!activeObject?.id || !activeConfig?.id) {
             console.warn("Missing required IDs for calculation");
@@ -36,7 +40,58 @@ function ShowCalculationProcessTable({activeConfig, activeObject, pricingConfig}
         }
     };
 
-    // Автоматически загружаем данные при монтировании компонента
+    const handleSavePrices = async () => {
+        if (!activeObject?.id || !activeConfig?.id || !pricingConfig?.id) {
+            console.warn("Missing required IDs for saving prices");
+            setSaveError("Відсутні необхідні дані для збереження");
+            return;
+        }
+
+        if (!scoringData) {
+            setSaveError("Спочатку потрібно розрахувати ціни");
+            return;
+        }
+
+        if (!scoringData.premises || scoringData.premises.length === 0) {
+            setSaveError("Немає даних про приміщення для збереження");
+            return;
+        }
+
+        setSaveLoading(true);
+        setSaveError(null);
+
+        try {
+            // Подготавливаем массив данных для всех квартир
+            const commitedPrices: CommittedPricesItem[] = scoringData.premises
+                .filter((premise: any) => premise.calculation)
+                .map((premise: any) => ({
+                    reo_id: activeObject.id,
+                    pricing_config_id: pricingConfig.id,
+                    distribution_config_id: activeConfig.id,
+                    is_active: true,
+                    actual_price: premise.calculation.actual_price_per_sqm || 0,
+                    x_rank: premise.calculation.normalized_rank || 0,
+                    content: premise.calculation
+                }));
+
+            const request: BulkCommittedPricesRequest = {
+                commited_prices: commitedPrices
+            };
+
+            console.log(`Saving committed prices for ${commitedPrices.length} premises:`, request);
+            
+            await saveCommittedPrices(request);
+
+            showSuccess(`Ціни успішно збережено для ${commitedPrices.length} приміщень!`);
+        } catch (error) {
+            console.error("Error saving prices:", error);
+            setSaveError("Не вдалося зберегти ціни");
+            showError("Не вдалося зберегти ціни");
+        } finally {
+            setSaveLoading(false);
+        }
+    };
+
     useEffect(() => {
         fetchCalculationData();
     }, [activeObject?.id, activeConfig?.id]);
@@ -46,16 +101,41 @@ function ShowCalculationProcessTable({activeConfig, activeObject, pricingConfig}
             <h2>Процес розрахунків</h2>
 
             <div style={{ marginTop: 24 }}>
-                <button
-                    className="_calculateButton_19p30_143"
-                    onClick={fetchCalculationData}
-                    disabled={scoringLoading}
-                >
-                    {scoringLoading ? "Розрахунок..." : "Розрахувати ціну"}
-                </button>
+                <div style={{ display: "flex", gap: "12px", marginBottom: "12px" }}>
+                    <button
+                        className="_calculateButton_19p30_143"
+                        onClick={fetchCalculationData}
+                        disabled={scoringLoading}
+                    >
+                        {scoringLoading ? "Розрахунок..." : "Розрахувати ціну"}
+                    </button>
+                    
+                    <button
+                        className="_calculateButton_19p30_143"
+                        onClick={handleSavePrices}
+                        disabled={saveLoading || !scoringData}
+                        style={{ 
+                            backgroundColor: scoringData ? "#28a745" : "#6c757d",
+                            color: "white",
+                            border: "none",
+                            padding: "8px 16px",
+                            borderRadius: "4px",
+                            cursor: scoringData ? "pointer" : "not-allowed"
+                        }}
+                    >
+                        {saveLoading 
+                            ? `Збереження... (${scoringData?.premises?.length || 0} приміщень)` 
+                            : `Зберегти ціни (${scoringData?.premises?.length || 0} приміщень)`
+                        }
+                    </button>
+                </div>
 
                 {scoringError && (
                     <div style={{ color: "red", marginTop: 12 }}>{scoringError}</div>
+                )}
+
+                {saveError && (
+                    <div style={{ color: "red", marginTop: 12 }}>{saveError}</div>
                 )}
 
                 {scoringData?.premises?.length > 0 && (

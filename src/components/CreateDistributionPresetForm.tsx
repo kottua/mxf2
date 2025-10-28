@@ -2,6 +2,7 @@ import React, { type FormEvent, useState } from 'react';
 import DistributionDynamicParams from "./DistributionDynamicParams.tsx";
 import { createDistributionConfig } from "../api/DistributionConfigApi.ts";
 import type {DistributionConfig} from "../interfaces/DistributionConfig.ts";
+import {useNotification} from "../hooks/useNotification.ts";
 
 interface CreateDistributionProps {
     setDistributeConfig: (config: (prev: DistributionConfig[]) => (DistributionConfig | any)[]) => void;
@@ -13,6 +14,7 @@ interface DistributionFunctionConfig {
 }
 
 function CreateDistributionPresetForm({ setDistributeConfig }: CreateDistributionProps) {
+    const { showError } = useNotification();
     const [presetName, setPresetName] = useState<string>("");
     const distributionFunctions = ["Uniform", "Gaussian", "Bimodal"];
     const [functionName, setFunctionName] = useState("Uniform");
@@ -61,7 +63,7 @@ function CreateDistributionPresetForm({ setDistributeConfig }: CreateDistributio
             });
         }
         if (presetName.trim() === "") {
-            alert("Будь ласка, введіть назву пресету.");
+            showError("Будь ласка, введіть назву пресету.");
             return;
         }
         params["function_type"] = functionName;

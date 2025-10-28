@@ -4,6 +4,7 @@ import type {RealEstateObjectData} from "../interfaces/RealEstateObjectData.ts";
 import type {ChangeEvent} from "react";
 import {uploadSpecificationFile} from "../api/PremisesApi.ts";
 import styles from './UploadSpecificationFile.module.css';
+import {useNotification} from "../hooks/useNotification.ts";
 
 interface UploadSpecificationFileProps {
     isPreview: boolean;
@@ -18,21 +19,20 @@ function UploadSpecificationFile({
                                      previewSpecData,
                                      setPreviewSpecData,
                                  }: UploadSpecificationFileProps) {
+    const { showError, showSuccess } = useNotification();
     const [isLoading, setIsLoading] = useState(false);
 
     const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file || !file.name.match(/\.(xlsx|xls)$/)) {
-            alert('Будь ласка, виберіть файл формату .xlsx або .xls');
+            showError('Будь ласка, виберіть файл формату .xlsx або .xls');
             return;
         }
 
         setIsLoading(true);
         try {
             const data = await uploadSpecificationFile(file);
-            console.log('API Response data:', data);
-            console.log('Data length:', data.length);
-            
+
             if (!data || !Array.isArray(data)) {
                 throw new Error('Invalid response format from API');
             }
@@ -41,8 +41,7 @@ function UploadSpecificationFile({
             setIsPreview(true);
         } catch (error) {
             console.error('Помилка завантаження файлу:', error);
-            console.error('Error details:', error);
-            alert(`Не вдалося завантажити та обробити Excel-файл: ${error.message || 'Невідома помилка'}`);
+            showError(`Не вдалося завантажити та обробити Excel-файл: ${error.message || 'Невідома помилка'}`);
         } finally {
             setIsLoading(false);
         }

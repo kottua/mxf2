@@ -3,6 +3,7 @@ import DistributionDynamicParams from "./DistributionDynamicParams.tsx";
 import { createDistributionConfig } from "../api/DistributionConfigApi.ts";
 import type { DistributionConfig } from "../interfaces/DistributionConfig.ts";
 import styles from "./CreateDistributionModal.module.css";
+import {useNotification} from "../hooks/useNotification.ts";
 
 interface CreateDistributionModalProps {
     isOpen: boolean;
@@ -16,6 +17,7 @@ interface DistributionFunctionConfig {
 }
 
 function CreateDistributionModal({ isOpen, onClose, onSuccess }: CreateDistributionModalProps) {
+    const { showError } = useNotification();
     const [presetName, setPresetName] = useState<string>("");
     const [functionName, setFunctionName] = useState("Uniform");
     const [isLoading, setIsLoading] = useState(false);
@@ -51,7 +53,7 @@ function CreateDistributionModal({ isOpen, onClose, onSuccess }: CreateDistribut
         event.preventDefault();
         
         if (presetName.trim() === "") {
-            alert("Будь ласка, введіть назву пресету.");
+            showError("Будь ласка, введіть назву пресету.");
             return;
         }
 
@@ -88,7 +90,7 @@ function CreateDistributionModal({ isOpen, onClose, onSuccess }: CreateDistribut
             
         } catch (error) {
             console.error('Error while creating:', error);
-            alert("Помилка при створенні дистрибуції. Спробуйте ще раз.");
+            showError("Помилка при створенні дистрибуції. Спробуйте ще раз.");
         } finally {
             setIsLoading(false);
         }

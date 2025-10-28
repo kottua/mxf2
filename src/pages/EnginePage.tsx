@@ -11,6 +11,7 @@ import {fetchDistributionConfig} from "../api/DistributionConfigApi.ts";
 import type { DistributionConfig } from "../interfaces/DistributionConfig.ts";
 import { fetchPricingConfig } from "../api/PricingConfigApi.ts";
 import type { PricingConfig } from "../interfaces/PricingConfig.ts";
+import {useNotification} from "../hooks/useNotification.ts";
 
 export interface CalculationProcessData {
     onBoardingSpread: number;
@@ -19,6 +20,7 @@ export interface CalculationProcessData {
 }
 
 function EnginePage() {
+    const { showError, showSuccess } = useNotification();
     const { id } = useParams();
     const { activeObject, setActiveObject, isLoading, setIsLoading } = useActiveRealEstateObject();
     const [selectedEngine, setSelectedEngine] = useState("Regular");
@@ -36,9 +38,10 @@ function EnginePage() {
             try {
                 const response = await fetchRealEstateObject(Number(id));
                 setActiveObject(response);
+                showSuccess("Дані об'єкта успішно завантажені.");
             } catch (error) {
                 console.error("Error fetching real estate object:", error);
-                alert("Не вдалося завантажити дані об'єкта.");
+                showError("Не вдалося завантажити дані об'єкта.");
             }
         }
 
@@ -48,7 +51,7 @@ function EnginePage() {
                 setPricingConfig(response);
             } catch (error) {
                 console.error("Error fetching pricing config:", error);
-                alert("Не вдалося завантажити pricing конфігурацію.");
+                showError("Не вдалося завантажити pricing конфігурацію.");
             }
         }
 
@@ -63,7 +66,7 @@ function EnginePage() {
         async function getDistributionConfig() {
             if (!pricingConfig?.content?.staticConfig?.distribConfigId) {
                 console.warn("Distribution Config ID is missing.");
-                alert("Distribution Config ID відсутній.");
+                showError("Distribution Config ID відсутній.");
                 return;
             }
             try {
@@ -73,7 +76,7 @@ function EnginePage() {
                 setActiveConfig(response);
             } catch (error) {
                 console.error("Error fetching distribution config:", error);
-                alert("Не вдалося завантажити distribution конфігурацію.");
+                showError("Не вдалося завантажити distribution конфігурацію.");
             }
         }
 

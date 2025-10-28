@@ -14,8 +14,10 @@ import styles from "./ConfigurePage.module.css";
 import type { DistributionConfig } from "../interfaces/DistributionConfig.ts";
 import { fetchDistributionConfigs } from "../api/DistributionConfigApi.ts";
 import DistributionManager from "../components/DistributionManager.tsx";
+import {useNotification} from "../hooks/useNotification.ts";
 
 function ConfigurePage() {
+    const { showError, showSuccess } = useNotification();
     const { id } = useParams();
     const { activeObject, setActiveObject, isLoading, setIsLoading } = useActiveRealEstateObject();
     const [dynamicConfig, setDynamicConfig] = useState<DynamicParametersConfig | null>(null);
@@ -26,7 +28,6 @@ function ConfigurePage() {
     const [priorities, setPriorities] = useState<ColumnPriorities>({});
     const navigate = useNavigate();
 
-    // Загрузка настроек дистрибуции при каждом переходе на страницу
     useEffect(() => {
         async function getDistributionConfigs() {
             try {
@@ -53,7 +54,7 @@ function ConfigurePage() {
                 setActiveObject(response);
             } catch (error) {
                 console.error("Error fetching real estate object:", error);
-                alert("Не вдалося завантажити дані об'єкта.");
+                showError("Не вдалося завантажити дані об'єкта.");
             }
         }
 
@@ -99,27 +100,24 @@ function ConfigurePage() {
 
     function handleGoToEngine() {
         if (!checkIsEngineReady()) {
-            alert("Будь ласка, заповніть всі параметри перед переходом до Engine");
+            showError("Будь ласка, заповніть всі параметри перед переходом до Engine");
             return;
         }
         navigate(`/engine/${id}`);
     }
 
     async function handleSaveConfig() {
-        // Сначала проверяем, что все необходимые данные заполнены
         if (!dynamicConfig) {
-            alert("Будь ласка, заповніть динамічні параметри");
+            showError("Будь ласка, заповніть динамічні параметри");
             return;
         }
         
-        // Получаем актуальные данные статичных параметров из формы
         const staticForm = document.querySelector('form') as HTMLFormElement;
         if (!staticForm) {
-            alert("Не знайдено форму статичних параметрів");
+            showError("Не знайдено форму статичних параметрів");
             return;
         }
         
-        // Собираем данные из формы статичных параметров
         const formData = new FormData(staticForm);
         const staticConfigData: StaticParametersConfig = {
             bargainGap: Number(formData.get('negotiation_discount')) || 0,
@@ -134,7 +132,6 @@ function ConfigurePage() {
             distribConfigId: Number(formData.get('distributionConfig')) || null
         };
         
-        // Обновляем локальное состояние статичных параметров
         setStaticConfig(staticConfigData);
         
         setIsLoading(true);
@@ -156,10 +153,10 @@ function ConfigurePage() {
 
             const response = await createPricingConfig(Number(id), configToSave);
             setPricingConfig(response[response.length - 1]);
-            alert("Конфігурацію успішно збережено!");
+            showSuccess("Конфігурацію успішно збережено!");
         } catch (error) {
             console.error("Error saving pricing config:", error);
-            alert("Не вдалося зберегти конфігурацію.");
+            showError("Не вдалося зберегти конфігурацію.");
         } finally {
             setIsLoading(false);
         }

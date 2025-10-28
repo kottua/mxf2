@@ -5,6 +5,7 @@ import type {IncomePlan} from "../interfaces/IncomePlan.ts";
 import type {Premises} from "../interfaces/Premises.ts";
 import styles from "./StaticParameters.module.css";
 import type {DistributionConfig} from "../interfaces/DistributionConfig.ts";
+import {useNotification} from "../hooks/useNotification.ts";
 
 interface StaticParametersProps {
     currentConfig: StaticParametersConfig | null;
@@ -15,6 +16,7 @@ interface StaticParametersProps {
 }
 
 function StaticParameters({ currentConfig, setStaticConfig, incomePlans, premises, distribConfigs }: StaticParametersProps) {
+    const { showSuccess } = useNotification();
     const [bargainGap, setBargainGap] = useState(0);
     const [maxify_factor, setMaxifyFactor] = useState(0);
     const [current_price_per_sqm, setCurrentPricePerSqm] = useState(0);
@@ -24,9 +26,6 @@ function StaticParameters({ currentConfig, setStaticConfig, incomePlans, premise
     const [oversold_method, setOversoldMethod] = useState("pieces");
     const [sigma, setSigma] = useState(0);
     const [similarityThreshold, setSimilarityThreshold] = useState(0);
-    // const [maxBonus, setMaxBonus] = useState(0);
-    // const [bonusFactor, setBonusFactor] = useState(0);
-    // const [bonusScale, setBonusScale] = useState(0);
     const [activeConfigId, setActiveConfigId] = useState<number | null>(null);
 
     useEffect(() => {
@@ -40,12 +39,8 @@ function StaticParameters({ currentConfig, setStaticConfig, incomePlans, premise
             setOversoldMethod(currentConfig.oversold_method);
             setSigma(currentConfig.sigma);
             setSimilarityThreshold(currentConfig.similarityThreshold);
-            // setMaxBonus(currentConfig.maxBonus);
-            // setBonusFactor(currentConfig.bonusFactor);
-            // setBonusScale(currentConfig.bonusScale);
             setActiveConfigId(currentConfig.distribConfigId ?? distribConfigs[0]?.id ?? null);
         } else if (distribConfigs.length > 0) {
-            // Set default distribConfigId if no currentConfig but distribConfigs are available
             setActiveConfigId(distribConfigs[0].id);
         }
     }, [currentConfig, distribConfigs]);
@@ -89,7 +84,7 @@ function StaticParameters({ currentConfig, setStaticConfig, incomePlans, premise
             distribConfigId: activeConfigId
         }
         setStaticConfig(newConfig);
-        alert('Статичні параметри локально збережено!');
+        showSuccess('Статичні параметри локально збережено!');
     }
 
     return (

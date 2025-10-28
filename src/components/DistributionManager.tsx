@@ -4,6 +4,7 @@ import CreateDistributionModal from "./CreateDistributionModal";
 import AllDistributionsModal from "./AllDistributionsModal.tsx";
 import { deleteDistributionConfig } from "../api/DistributionConfigApi.ts";
 import styles from "./DistributionManager.module.css";
+import {useNotification} from "../hooks/useNotification.ts";
 
 interface DistributionManagerProps {
     distribConfigs: DistributionConfig[];
@@ -11,6 +12,7 @@ interface DistributionManagerProps {
 }
 
 function DistributionManager({ distribConfigs, setDistribConfigs }: DistributionManagerProps) {
+    const { showError } = useNotification();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isAllDistributionsModalOpen, setIsAllDistributionsModalOpen] = useState(false);
 
@@ -66,7 +68,7 @@ function DistributionManager({ distribConfigs, setDistribConfigs }: Distribution
                 })
                 .catch((error) => {
                     console.error('Error deleting distribution config:', error);
-                    alert('Помилка при видаленні дистрибуції. Спробуйте ще раз.');
+                    showError('Помилка при видаленні дистрибуції. Спробуйте ще раз.');
                 });
         }
     }

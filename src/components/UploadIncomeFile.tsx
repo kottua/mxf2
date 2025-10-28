@@ -5,6 +5,9 @@ import type {ChangeEvent} from 'react';
 import {uploadIncomePlansFile} from '../api/IncomePlanApi';
 import styles from './UploadIncomeFile.module.css';
 
+import {useNotification} from "../hooks/useNotification.ts";
+
+
 interface UploadIncomeFileProps {
     isPreview: boolean;
     setIsPreview: (value: boolean) => void;
@@ -18,12 +21,13 @@ function UploadIncomeFile({
                               previewIncomeData,
                               setPreviewIncomeData,
                           }: UploadIncomeFileProps) {
+    const { showError, showSuccess } = useNotification();
     const [isLoading, setIsLoading] = useState(false);
 
     const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file || !file.name.match(/\.(xlsx|xls)$/)) {
-            alert('Будь ласка, виберіть файл формату .xlsx або .xls');
+            showError('Будь ласка, виберіть файл формату .xlsx або .xls');
             return;
         }
 
@@ -38,10 +42,9 @@ function UploadIncomeFile({
             setPreviewIncomeData(data);
             setIsPreview(true);
         } catch (error) {
-            console.error('Помилка завантаження файлу плану доходів:', error);
-            console.error('Error details:', error);
-            alert(`Не вдалося завантажити та обробити Excel-файл плану доходів: ${error.message || 'Невідома помилка'}`);
+            showError(`Не вдалося завантажити та обробити Excel-файл плану доходів: ${error.message || 'Невідома помилка'}`);
         } finally {
+            showSuccess('Файл успішно завантажено та оброблено');
             setIsLoading(false);
         }
     };

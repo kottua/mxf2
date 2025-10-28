@@ -5,6 +5,7 @@ import type {IncomePlan} from "../interfaces/IncomePlan.ts";
 import type {Premises} from "../interfaces/Premises.ts";
 import styles from "./StaticParametersPanel.module.css";
 import type {DistributionConfig} from "../interfaces/DistributionConfig.ts";
+import {useNotification} from "../hooks/useNotification.ts";
 
 interface StaticParametersPanelProps {
     currentConfig: StaticParametersConfig | null;
@@ -15,6 +16,7 @@ interface StaticParametersPanelProps {
 }
 
 function StaticParametersPanel({ currentConfig, setStaticConfig, incomePlans, premises, distribConfigs }: StaticParametersPanelProps) {
+    const { showSuccess } = useNotification();
     const [bargainGap, setBargainGap] = useState(0);
     const [maxify_factor, setMaxifyFactor] = useState(0);
     const [current_price_per_sqm, setCurrentPricePerSqm] = useState(0);
@@ -26,19 +28,6 @@ function StaticParametersPanel({ currentConfig, setStaticConfig, incomePlans, pr
     const [similarityThreshold, setSimilarityThreshold] = useState(0);
     const [activeConfigId, setActiveConfigId] = useState<number | null>(null);
 
-    // Функция для получения текущей конфигурации
-    const getCurrentConfig = (): StaticParametersConfig => ({
-        bargainGap,
-        maxify_factor,
-        current_price_per_sqm,
-        minimum_liq_refusal_price,
-        maximum_liq_refusal_price,
-        overestimate_correct_factor,
-        oversold_method: oversold_method as "pieces" | "area",
-        sigma,
-        similarityThreshold,
-        distribConfigId: activeConfigId
-    });
 
     useEffect(() => {
         if (currentConfig) {
@@ -92,7 +81,7 @@ function StaticParametersPanel({ currentConfig, setStaticConfig, incomePlans, pr
             distribConfigId: activeConfigId
         }
         setStaticConfig(newConfig);
-        alert('Статичні параметри локально збережено!');
+        showSuccess('Статичні параметри локально збережено!');
     }
 
     return (

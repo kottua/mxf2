@@ -2,6 +2,7 @@ import {useState} from "react";
 import type {RealEstateObject} from "../interfaces/RealEstateObject.ts";
 import styles from "./EnginePriceCalculator.module.css";
 import type {CalculationProcessData} from "../pages/EnginePage.tsx";
+import {useNotification} from "../hooks/useNotification.ts";
 
 interface EnginePriceCalculatorProps {
     realObject: RealEstateObject | null;
@@ -9,12 +10,12 @@ interface EnginePriceCalculatorProps {
     setCalculationProcessData: (data: CalculationProcessData) => void;
 }
 
-function EnginePriceCalculator({ realObject, selectedEngine, setCalculationProcessData }: EnginePriceCalculatorProps) {
-    const [calculatedPrice, setCalculatedPrice] = useState<number | string>(0);
+function EnginePriceCalculator({ realObject, selectedEngine}: EnginePriceCalculatorProps) {
+    const { showError } = useNotification();
+    const [calculatedPrice] = useState<number | string>(0);
 
     function onCalculatePrice(){
-        // actualPricePerSQM(realObject, selectedEngine, normContributeRT, setCalculationProcessData, setCalculatedPrice);
-        alert('Тут поки ніфіга нема')
+        showError('Тут поки ніфіга нема')
     }
 
     return (
