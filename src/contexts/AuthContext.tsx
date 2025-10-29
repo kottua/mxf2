@@ -61,6 +61,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     refreshAuth();
+    
+    const handleTokensCleared = () => {
+      setUserProfile(null);
+      setIsAuthenticated(false);
+    };
+    
+    window.addEventListener('auth-tokens-cleared', handleTokensCleared);
+    
+    return () => {
+      window.removeEventListener('auth-tokens-cleared', handleTokensCleared);
+    };
   }, []);
 
   return (

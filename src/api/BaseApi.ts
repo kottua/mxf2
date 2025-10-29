@@ -24,6 +24,8 @@ export const clearAuthTokens = (): void => {
   localStorage.removeItem('accessToken');
   localStorage.removeItem('refreshToken');
   localStorage.removeItem('tokenType');
+  
+  window.dispatchEvent(new CustomEvent('auth-tokens-cleared'));
 };
 
 export const setAuthTokens = (tokenData: {token_type: string; access_token: string; refresh_token: string}): void => {
@@ -36,6 +38,7 @@ export const refreshAccessToken = async (): Promise<{token_type: string; access_
   const refreshToken = getRefreshToken();
   
   if (!refreshToken) {
+    clearAuthTokens();
     throw new Error('No refresh token available');
   }
   
@@ -48,7 +51,7 @@ export const refreshAccessToken = async (): Promise<{token_type: string; access_
     localStorage.setItem('tokenType', response.data.token_type);
     
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     clearAuthTokens();
     throw error;
   }
@@ -92,6 +95,10 @@ api.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
+        if (originalRequest.url?.includes('/auth/refresh')) {
+            return Promise.reject(error);
+        }
+
         if (error.response?.status === 401 && !originalRequest._retry) {
             if (isRefreshing) {
                 return new Promise((resolve, reject) => {
@@ -120,8 +127,9 @@ api.interceptors.response.use(
                 
                 return api(originalRequest);
                 
-            } catch (refreshError) {
+            } catch (refreshError: any) {
                 processQueue(refreshError, null);
+                
                 clearAuthTokens();
                 
                 if ((window as any).redirectToLogin) {

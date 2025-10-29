@@ -31,13 +31,3 @@ export const fieldTranslations: Record<string, string> = {
 export function getFieldDisplayName(fieldName: string): string {
     return fieldTranslations[fieldName] || fieldName;
 }
-
-
-
-
-
-
-
-
-
-

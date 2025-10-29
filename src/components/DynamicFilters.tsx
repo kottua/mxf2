@@ -23,11 +23,89 @@ function DynamicFilters({premises, currentConfig, onConfigChange}: DynamicFilter
         }
     }, [currentConfig]);
 
+    type FieldVisibilityRule = 'hidden' | 'always' | 'conditional';
+
+    const fieldVisibilityRules: Record<string, FieldVisibilityRule> = {
+        // Hidden fields
+        'property_type': 'hidden',
+        'premises_id': 'hidden',
+        'estimated_area_m2': 'hidden',
+        'price_per_meter': 'hidden',
+        'status': 'hidden',
+        'sales_amount': 'hidden',
+        
+        // Always show fields
+        'number_of_unit': 'always',
+        'number': 'always',
+        'floor': 'always',
+        'layout_type': 'always',
+        'total_area_m2': 'always',
+        'number_of_rooms': 'always',
+        'view_from_window': 'always',
+        
+        // Conditional fields (show if all premises have defined, two or more different values)
+        'entrance': 'conditional',
+        'full_price': 'conditional',
+        'living_area_m2': 'conditional',
+        'kitchen_area_m2': 'conditional',
+        'number_of_levels': 'conditional',
+        'number_of_loggias': 'conditional',
+        'number_of_balconies': 'conditional',
+        'number_of_bathrooms_with_toilets': 'conditional',
+        'number_of_separate_bathrooms': 'conditional',
+        'number_of_terraces': 'conditional',
+        'studio': 'conditional',
+    };
+
+    function shouldShowConditionalField(fieldName: string): boolean {
+        const allDefined = premises.every(premise => {
+            const value = premise[fieldName as keyof Premises];
+            if (typeof value === 'boolean') {
+                return true;
+            }
+            return value !== undefined && value !== null && value !== '';
+        });
+
+        if (!allDefined) {
+            return false;
+        }
+
+        const values = new Set<string>();
+        premises.forEach(premise => {
+            const value = premise[fieldName as keyof Premises];
+            if (typeof value === 'boolean') {
+                values.add(String(value));
+            } else if (value !== undefined && value !== null && value !== '') {
+                values.add(String(value));
+            }
+        });
+
+        return values.size >= 2;
+    }
+
     function getAvailableFields(): string[] {
         const firstPremise = premises[0];
         const baseFields = Object.keys(firstPremise).filter(key =>
             key !== 'id' && key !== 'reo_id' && key !== "uploaded" && key !== "customcontent"
         );
+
+        const filteredBaseFields = baseFields.filter(field => {
+            const rule = fieldVisibilityRules[field];
+            
+            if (rule === 'hidden') {
+                return false;
+            }
+            
+            if (rule === 'always') {
+                return true;
+            }
+            
+            if (rule === 'conditional') {
+                return shouldShowConditionalField(field);
+            }
+            
+            return true;
+        });
 
         const customContentKeys = new Set<string>();
         premises.forEach(premise => {
@@ -38,7 +116,35 @@ function DynamicFilters({premises, currentConfig, onConfigChange}: DynamicFilter
             }
         });
 
-        return [...baseFields, ...Array.from(customContentKeys)];
+        const filteredCustomFields = Array.from(customContentKeys).filter(field => {
+            const allDefined = premises.every(premise => {
+                const customContent = premise.customcontent;
+                if (!customContent || typeof customContent !== 'object') {
+                    return false;
+                }
+                const value = customContent[field];
+                return value !== undefined && value !== null && value !== '';
+            });
+
+            if (!allDefined) {
+                return false;
+            }
+
+            const values = new Set<string>();
+            premises.forEach(premise => {
+                const customContent = premise.customcontent;
+                if (customContent && typeof customContent === 'object') {
+                    const value = customContent[field];
+                    if (value !== undefined && value !== null && value !== '') {
+                        values.add(String(value));
+                    }
+                }
+            });
+
+            return values.size >= 2;
+        });
+
+        return [...filteredBaseFields, ...filteredCustomFields];
     }
 
     function handleFieldToggle(field: string) {
@@ -87,6 +193,7 @@ function DynamicFilters({premises, currentConfig, onConfigChange}: DynamicFilter
 
     const totalWeight = Object.values(config.weights).reduce((sum, weight) => sum + weight, 0);
     const availableFields = getAvailableFields();
+
 
     if (availableFields.length === 0){
         return (
