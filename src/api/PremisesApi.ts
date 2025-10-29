@@ -67,3 +67,40 @@ export async function uploadSpecificationFile(
     
     return data;
 }
+
+export async function downloadPremisesExcel(
+    reo_id: number,
+    distribution_config_id: number
+): Promise<void> {
+    const response = await api.get(
+        `/premises/download/excel/${reo_id}/${distribution_config_id}`,
+        {
+            responseType: 'blob',
+        }
+    );
+
+    // Extract filename from Content-Disposition header or use default
+    const contentDisposition = response.headers['content-disposition'] || response.headers['Content-Disposition'];
+    let filename = `premises_with_actual_price_reo_${reo_id}_dist_${distribution_config_id}.xlsx`;
+    
+    if (contentDisposition) {
+        // Handle both quoted and unquoted filenames: filename="file.xlsx" or filename=file.xlsx
+        const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+        if (filenameMatch && filenameMatch[1]) {
+            filename = filenameMatch[1].replace(/['"]/g, '');
+        }
+    }
+
+    // Create blob URL and trigger download
+    const blob = new Blob([response.data], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+}

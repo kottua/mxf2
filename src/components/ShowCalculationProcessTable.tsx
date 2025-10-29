@@ -1,6 +1,7 @@
 import {useState, useEffect} from "react";
 import {calculateScoringByIds} from "../api/ScoringApi.ts";
 import {saveCommittedPrices, type CommittedPricesItem, type BulkCommittedPricesRequest} from "../api/CommittedPricesApi.ts";
+import {downloadPremisesExcel} from "../api/PremisesApi.ts";
 import type {DistributionConfig} from "../interfaces/DistributionConfig.ts";
 import type {RealEstateObject} from "../interfaces/RealEstateObject.ts";
 import type {PricingConfig} from "../interfaces/PricingConfig.ts";
@@ -19,6 +20,7 @@ function ShowCalculationProcessTable({activeConfig, activeObject, pricingConfig}
     const [scoringData, setScoringData] = useState<any>(null);
     const [saveLoading, setSaveLoading] = useState(false);
     const [saveError, setSaveError] = useState<string | null>(null);
+    const [downloadLoading, setDownloadLoading] = useState(false);
 
     const fetchCalculationData = async () => {
         if (!activeObject?.id || !activeConfig?.id) {
@@ -71,7 +73,7 @@ function ShowCalculationProcessTable({activeConfig, activeObject, pricingConfig}
                     is_active: true,
                     actual_price: premise.calculation.actual_price_per_sqm || 0,
                     x_rank: premise.calculation.normalized_rank || 0,
-                    content: premise.calculation
+                    content: premise
                 }));
 
             const request: BulkCommittedPricesRequest = {
@@ -89,6 +91,28 @@ function ShowCalculationProcessTable({activeConfig, activeObject, pricingConfig}
             showError("Не вдалося зберегти ціни");
         } finally {
             setSaveLoading(false);
+        }
+    };
+
+    const handleDownloadSpecification = async () => {
+        if (!activeObject?.id || !activeConfig?.id) {
+            console.warn("Missing required IDs for downloading specification");
+            setSaveError("Відсутні необхідні дані для завантаження");
+            return;
+        }
+
+        setDownloadLoading(true);
+        setSaveError(null);
+
+        try {
+            await downloadPremisesExcel(activeObject.id, activeConfig.id);
+            showSuccess("Специфікацію успішно завантажено!");
+        } catch (error) {
+            console.error("Error downloading specification:", error);
+            setSaveError("Не вдалося завантажити специфікацію");
+            showError("Не вдалося завантажити специфікацію");
+        } finally {
+            setDownloadLoading(false);
         }
     };
 
@@ -127,6 +151,22 @@ function ShowCalculationProcessTable({activeConfig, activeObject, pricingConfig}
                             ? `Збереження... (${scoringData?.premises?.length || 0} приміщень)` 
                             : `Зберегти ціни (${scoringData?.premises?.length || 0} приміщень)`
                         }
+                    </button>
+                    
+                    <button
+                        className="_calculateButton_19p30_143"
+                        onClick={handleDownloadSpecification}
+                        disabled={downloadLoading || !activeObject?.id || !activeConfig?.id}
+                        style={{ 
+                            backgroundColor: (activeObject?.id && activeConfig?.id) ? "#007bff" : "#6c757d",
+                            color: "white",
+                            border: "none",
+                            padding: "8px 16px",
+                            borderRadius: "4px",
+                            cursor: (activeObject?.id && activeConfig?.id) ? "pointer" : "not-allowed"
+                        }}
+                    >
+                        {downloadLoading ? "Завантаження..." : "Завантажити Специфікацію"}
                     </button>
                 </div>
 
