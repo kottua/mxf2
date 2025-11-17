@@ -16,7 +16,8 @@ export interface RealEstateObject {
     created: string;
     updated_at: string;
     premises: Premises[];
-    pricing_configs: PricingConfig[];
+    pricing_configs?: PricingConfig[];
+    pricing_config?: PricingConfig;
     committed_prices: CommittedPrices[];
     income_plans: IncomePlan[];
     status_mappings: StatusMapping[];

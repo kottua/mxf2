@@ -14,3 +14,11 @@ export async function createPricingConfig(objId: number, config: PricingConfig) 
     });
     return data;
 }
+
+export async function updatePricingConfig(configId: number, content: { staticConfig: any; dynamicConfig: any; ranging: any }) {
+    const { data } = await api.put<PricingConfig>(`/pricing-configs/${configId}`, {
+        'is_active': true,
+        'content': content
+    });
+    return data;
+}

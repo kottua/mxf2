@@ -20,6 +20,7 @@ function StaticParametersPanel({ currentConfig, setStaticConfig, incomePlans, pr
     const [bargainGap, setBargainGap] = useState(0);
     const [maxify_factor, setMaxifyFactor] = useState(0);
     const [current_price_per_sqm, setCurrentPricePerSqm] = useState(0);
+    const [onboarding_current_price_per_sqm, setOnboardingCurrentPricePerSqm] = useState(0);
     const [minimum_liq_refusal_price, setMinimumLiqRefusalPrice] = useState(0);
     const [maximum_liq_refusal_price, setMaximumLiqRefusalPrice] = useState(0);
     const [overestimate_correct_factor, setOverestimateCorrectFactor] = useState(0);
@@ -34,6 +35,8 @@ function StaticParametersPanel({ currentConfig, setStaticConfig, incomePlans, pr
             setBargainGap(currentConfig.bargainGap);
             setMaxifyFactor(currentConfig.maxify_factor);
             setCurrentPricePerSqm(currentConfig.current_price_per_sqm);
+            // Если конфиг существует, берем onboarding_current_price_per_sqm из конфига (даже если 0)
+            setOnboardingCurrentPricePerSqm(currentConfig.onboarding_current_price_per_sqm ?? 0);
             setMinimumLiqRefusalPrice(currentConfig.minimum_liq_refusal_price);
             setMaximumLiqRefusalPrice(currentConfig.maximum_liq_refusal_price);
             setOverestimateCorrectFactor(currentConfig.overestimate_correct_factor);
@@ -47,6 +50,7 @@ function StaticParametersPanel({ currentConfig, setStaticConfig, incomePlans, pr
     }, [currentConfig, distribConfigs]);
 
 
+    // Расчет current_price_per_sqm - пересчитывается каждый раз при изменении данных
     useEffect(() => {
         if (premises && incomePlans.length > 0) {
             const newPrice = calculateOnboardingPrice(
@@ -65,6 +69,26 @@ function StaticParametersPanel({ currentConfig, setStaticConfig, incomePlans, pr
         }
     }, [oversold_method, incomePlans, premises, current_price_per_sqm]);
 
+    // Расчет onboarding_current_price_per_sqm - только если pricing_config еще не существует (новый дом)
+    useEffect(() => {
+        // Если currentConfig существует, значит pricing_config уже есть - НЕ пересчитываем onboarding_current_price_per_sqm
+        if (currentConfig) {
+            return; // Не пересчитываем, используем значение из конфига
+        }
+        
+        // Если currentConfig не существует (новый дом), рассчитываем onboarding_current_price_per_sqm автоматически
+        if (!currentConfig && premises && incomePlans.length > 0 && onboarding_current_price_per_sqm === 0 && current_price_per_sqm > 0) {
+            const onboardingPrice = calculateOnboardingPrice(
+                { current_price_per_sqm: current_price_per_sqm.toString() },
+                premises,
+                { oversold_method: oversold_method as "pieces" | "area" },
+                incomePlans
+            );
+
+            setOnboardingCurrentPricePerSqm(onboardingPrice);
+        }
+    }, [premises, incomePlans, oversold_method, onboarding_current_price_per_sqm, current_price_per_sqm, currentConfig]);
+
     function handleSubmit(e: FormEvent){
         e.preventDefault();
 
@@ -72,6 +96,7 @@ function StaticParametersPanel({ currentConfig, setStaticConfig, incomePlans, pr
             bargainGap,
             maxify_factor,
             current_price_per_sqm,
+            onboarding_current_price_per_sqm,
             minimum_liq_refusal_price,
             maximum_liq_refusal_price,
             overestimate_correct_factor,
@@ -130,6 +155,18 @@ function StaticParametersPanel({ currentConfig, setStaticConfig, incomePlans, pr
                             id='current_price_per_sqm'
                             name='current_price_per_sqm'
                             value={current_price_per_sqm}
+                            readOnly
+                            className={`${styles.input} ${styles.readonly}`}
+                        />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label htmlFor="onboarding_current_price_per_sqm" className={styles.label}>Онбордінг ціна за м²</label>
+                        <input
+                            type="number"
+                            id='onboarding_current_price_per_sqm'
+                            name='onboarding_current_price_per_sqm'
+                            value={onboarding_current_price_per_sqm}
                             readOnly
                             className={`${styles.input} ${styles.readonly}`}
                         />

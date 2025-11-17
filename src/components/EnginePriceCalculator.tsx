@@ -43,13 +43,13 @@ function EnginePriceCalculator({ realObject, selectedEngine}: EnginePriceCalcula
                         <div className={styles.infoItem}>
                             <span className={styles.infoLabel}>Мін. ліквідність:</span>
                             <span className={styles.infoValue}>
-                                {realObject.pricing_configs[0]?.content.staticConfig.minimum_liq_refusal_price?.toFixed(2) || '0.00'}
+                                {realObject.pricing_config.content.staticConfig.minimum_liq_refusal_price?.toFixed(2) || '0.00'}
                             </span>
                         </div>
                         <div className={styles.infoItem}>
                             <span className={styles.infoLabel}>Макс. ліквідність:</span>
                             <span className={styles.infoValue}>
-                                {realObject.pricing_configs[0]?.content.staticConfig.maximum_liq_refusal_price?.toFixed(2) || '0.00'}
+                                {realObject.pricing_config.content.staticConfig.maximum_liq_refusal_price?.toFixed(2) || '0.00'}
                             </span>
                         </div>
                     </>
