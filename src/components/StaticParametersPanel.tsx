@@ -20,6 +20,7 @@ function StaticParametersPanel({ currentConfig, setStaticConfig, incomePlans, pr
     const [bargainGap, setBargainGap] = useState(0);
     const [maxify_factor, setMaxifyFactor] = useState(0);
     const [current_price_per_sqm, setCurrentPricePerSqm] = useState(0);
+    const [onboarding_current_price_per_sqm, setOnboardingCurrentPricePerSqm] = useState(0);
     const [minimum_liq_refusal_price, setMinimumLiqRefusalPrice] = useState(0);
     const [maximum_liq_refusal_price, setMaximumLiqRefusalPrice] = useState(0);
     const [overestimate_correct_factor, setOverestimateCorrectFactor] = useState(0);
@@ -34,6 +35,10 @@ function StaticParametersPanel({ currentConfig, setStaticConfig, incomePlans, pr
             setBargainGap(currentConfig.bargainGap);
             setMaxifyFactor(currentConfig.maxify_factor);
             setCurrentPricePerSqm(currentConfig.current_price_per_sqm);
+            // If onboarding_current_price_per_sqm exists in API, use it; otherwise it will be calculated
+            if (currentConfig.onboarding_current_price_per_sqm !== undefined) {
+                setOnboardingCurrentPricePerSqm(currentConfig.onboarding_current_price_per_sqm);
+            }
             setMinimumLiqRefusalPrice(currentConfig.minimum_liq_refusal_price);
             setMaximumLiqRefusalPrice(currentConfig.maximum_liq_refusal_price);
             setOverestimateCorrectFactor(currentConfig.overestimate_correct_factor);
@@ -47,6 +52,7 @@ function StaticParametersPanel({ currentConfig, setStaticConfig, incomePlans, pr
     }, [currentConfig, distribConfigs]);
 
 
+    // Calculate current_price_per_sqm - always recalculates
     useEffect(() => {
         if (premises && incomePlans.length > 0) {
             const newPrice = calculateOnboardingPrice(
@@ -65,14 +71,38 @@ function StaticParametersPanel({ currentConfig, setStaticConfig, incomePlans, pr
         }
     }, [oversold_method, incomePlans, premises, current_price_per_sqm]);
 
+    useEffect(() => {
+        const shouldCalculate = (!currentConfig || currentConfig.onboarding_current_price_per_sqm === undefined) &&
+            onboarding_current_price_per_sqm === 0 &&
+            current_price_per_sqm > 0 &&
+            premises &&
+            incomePlans.length > 0;
+
+        if (shouldCalculate) {
+            const newOnboardingPrice = calculateOnboardingPrice(
+                { current_price_per_sqm: current_price_per_sqm.toString() },
+                premises,
+                { oversold_method: oversold_method as "pieces" | "area" },
+                incomePlans
+            );
+
+            setOnboardingCurrentPricePerSqm(newOnboardingPrice);
+        }
+    }, [oversold_method, incomePlans, premises, current_price_per_sqm, currentConfig, onboarding_current_price_per_sqm]);
+
     function handleSubmit(e: FormEvent){
         e.preventDefault();
+
+        const finalOnboardingPrice = (currentConfig?.onboarding_current_price_per_sqm !== undefined)
+            ? currentConfig.onboarding_current_price_per_sqm
+            : onboarding_current_price_per_sqm;
 
         const newConfig: StaticParametersConfig = {
             bargainGap,
             maxify_factor,
             current_price_per_sqm,
             minimum_liq_refusal_price,
+            onboarding_current_price_per_sqm: finalOnboardingPrice,
             maximum_liq_refusal_price,
             overestimate_correct_factor,
             oversold_method: oversold_method as "pieces" | "area",
@@ -135,8 +165,23 @@ function StaticParametersPanel({ currentConfig, setStaticConfig, incomePlans, pr
                         />
                     </div>
 
+
                     <div className={styles.formGroup}>
-                        <label htmlFor="minimum_liq_refusal_price" className={styles.label}>Ціна відмови для найгіршої ліквідності за м²</label>
+                        <label htmlFor="onboarding_current_price_per_sqm" className={styles.label}>Онбордінг ціна за
+                            м²</label>
+                        <input
+                            type="number"
+                            id='onboarding_current_price_per_sqm'
+                            name='onboarding_current_price_per_sqm'
+                            value={onboarding_current_price_per_sqm}
+                            readOnly
+                            className={`${styles.input} ${styles.readonly}`}
+                        />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label htmlFor="minimum_liq_refusal_price" className={styles.label}>Ціна відмови для найгіршої
+                            ліквідності за м²</label>
                         <input
                             type="number"
                             onChange={(e) => setMinimumLiqRefusalPrice(Number(e.target.value))}
@@ -150,7 +195,8 @@ function StaticParametersPanel({ currentConfig, setStaticConfig, incomePlans, pr
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label htmlFor="maximum_liq_refusal_price" className={styles.label}>Ціна відмови для найкращої ліквідності за м²</label>
+                        <label htmlFor="maximum_liq_refusal_price" className={styles.label}>Ціна відмови для найкращої
+                            ліквідності за м²</label>
                         <input
                             type="number"
                             onChange={(e) => setMaximumLiqRefusalPrice(Number(e.target.value))}
@@ -164,7 +210,8 @@ function StaticParametersPanel({ currentConfig, setStaticConfig, incomePlans, pr
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label htmlFor="overestimate_correct_factor" className={styles.label}>Коефіціент прискорення корекції розмаху</label>
+                        <label htmlFor="overestimate_correct_factor" className={styles.label}>Коефіціент прискорення
+                            корекції розмаху</label>
                         <input
                             type="number"
                             onChange={(e) => setOverestimateCorrectFactor(Number(e.target.value))}

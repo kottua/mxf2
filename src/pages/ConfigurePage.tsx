@@ -119,10 +119,20 @@ function ConfigurePage() {
         }
         
         const formData = new FormData(staticForm);
+        
+        // Preserve the old onboarding_current_price_per_sqm if it exists in API
+        // This ensures we always send the original onboarding value when updating config
+        // onboarding_current_price_per_sqm is calculated only once (at first config creation)
+        // If it doesn't exist in API (undefined), use the calculated value from the form
+        const onboardingPrice = (staticConfig?.onboarding_current_price_per_sqm !== undefined)
+            ? staticConfig.onboarding_current_price_per_sqm
+            : Number(formData.get('onboarding_current_price_per_sqm')) || 0;
+        
         const staticConfigData: StaticParametersConfig = {
             bargainGap: Number(formData.get('negotiation_discount')) || 0,
             maxify_factor: Number(formData.get('maxify_factor')) || 0,
             current_price_per_sqm: Number(formData.get('current_price_per_sqm')) || 0,
+            onboarding_current_price_per_sqm: onboardingPrice,
             minimum_liq_refusal_price: Number(formData.get('minimum_liq_refusal_price')) || 0,
             maximum_liq_refusal_price: Number(formData.get('maximum_liq_refusal_price')) || 0,
             overestimate_correct_factor: Number(formData.get('overestimate_correct_factor')) || 0,
