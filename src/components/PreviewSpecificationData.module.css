@@ -268,3 +268,49 @@
     scrollbar-width: thin;
     scrollbar-color: #cbd5e1 #f1f5f9;
 }
+
+/* Editable input styles */
+.editableInput {
+    min-width: 120px;
+    width: auto;
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    background: white;
+    color: #4b5563;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.editableInput:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.editableInput:hover {
+    border-color: #9ca3af;
+}
+
+.editableSelect {
+    min-width: 120px;
+    width: auto;
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    background: white;
+    color: #4b5563;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.editableSelect:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.editableSelect:hover {
+    border-color: #9ca3af;
+}

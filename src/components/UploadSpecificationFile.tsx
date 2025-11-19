@@ -76,7 +76,12 @@ function UploadSpecificationFile({
                 {isPreview ? 'Приховати завантажені дані' : 'Показати завантажені дані'}
             </button>
 
-            {isPreview && previewSpecData && previewSpecData.length > 0 && <PreviewSpecificationData data={previewSpecData} />}
+            {isPreview && previewSpecData && previewSpecData.length > 0 && (
+                <PreviewSpecificationData 
+                    data={previewSpecData} 
+                    onDataChange={setPreviewSpecData}
+                />
+            )}
         </section>
     );
 }
