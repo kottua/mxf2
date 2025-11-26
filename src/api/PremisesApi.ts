@@ -44,13 +44,14 @@ export interface UploadSpecificationParams {
 }
 
 export async function uploadSpecificationFile(
-    file: File
+    file: File,
+    reoId: number
 ): Promise<RealEstateObjectData[]> {
     const formData = new FormData();
     formData.append('file', file);
 
     const { data } = await api.post<RealEstateObjectData[]>(
-        "/premises/upload/specification", 
+        `/premises/upload/specification/${reoId}`, 
         formData,
         {
             headers: {
