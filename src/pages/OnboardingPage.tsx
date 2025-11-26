@@ -179,6 +179,7 @@ function OnboardingPage() {
                         setIsPreview={setIsSpecPreview}
                         previewSpecData={previewSpecData}
                         setPreviewSpecData={setPreviewSpecData}
+                        reoId={activeObject.id}
                     />
                 </section>
 

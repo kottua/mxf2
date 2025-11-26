@@ -11,6 +11,7 @@ interface UploadSpecificationFileProps {
     setIsPreview: (value: boolean) => void;
     previewSpecData: RealEstateObjectData[];
     setPreviewSpecData: (data: RealEstateObjectData[]) => void;
+    reoId: number;
 }
 
 function UploadSpecificationFile({
@@ -18,6 +19,7 @@ function UploadSpecificationFile({
                                      setIsPreview,
                                      previewSpecData,
                                      setPreviewSpecData,
+                                     reoId,
                                  }: UploadSpecificationFileProps) {
     const { showError, showSuccess } = useNotification();
     const [isLoading, setIsLoading] = useState(false);
@@ -31,7 +33,7 @@ function UploadSpecificationFile({
 
         setIsLoading(true);
         try {
-            const data = await uploadSpecificationFile(file);
+            const data = await uploadSpecificationFile(file, reoId);
 
             if (!data || !Array.isArray(data)) {
                 throw new Error('Invalid response format from API');
