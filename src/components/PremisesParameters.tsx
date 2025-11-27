@@ -100,7 +100,7 @@ function PremisesParameters({ premises, selectedColumns, priorities, setPrioriti
 
         // Удаляем отдельные элементы, которые теперь в группе
         const updatedColumnPriorities = (priorities[selectedColumn] || [])
-            .filter(item => !selectedValues.some(val => item.values.includes(val)))
+            .filter(item => !item.values || !Array.isArray(item.values) || !selectedValues.some(val => item.values.includes(val)))
             .concat(newGroup)
             .sort((a, b) => a.priority - b.priority);
 
@@ -149,7 +149,7 @@ function PremisesParameters({ premises, selectedColumns, priorities, setPrioriti
         if (!deletedItem) return;
 
         // Если это группа, возвращаем ее элементы обратно как отдельные
-        if (deletedItem.values.length > 1) {
+        if (deletedItem.values && Array.isArray(deletedItem.values) && deletedItem.values.length > 1) {
             const individualItems: PriorityItem[] = deletedItem.values.map((value, index) => ({
                 name: value,
                 values: [value],
@@ -317,12 +317,14 @@ function PremisesParameters({ premises, selectedColumns, priorities, setPrioriti
                                 Встановіть рейтинги (1 - найвищий)
                             </p>
                             <div className={styles.prioritiesList}>
-                                {priorities[selectedColumn].map(({ name, values, priority }) => (
+                                {[...priorities[selectedColumn]]
+                                    .sort((a, b) => a.priority - b.priority)
+                                    .map(({ name, values, priority }) => (
                                     <div key={name} className={styles.priorityItem}>
                                         <div className={styles.priorityHeader}>
                                             <div>
                                                 <span className={styles.priorityName}>{name}</span>
-                                                {values.length > 1 && (
+                                                {values && Array.isArray(values) && values.length > 1 && (
                                                     <span className={styles.priorityValues}>
                                                         Група: {values.join(", ")}
                                                     </span>

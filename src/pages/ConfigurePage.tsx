@@ -203,6 +203,7 @@ function ConfigurePage() {
                         premises={activeObject.premises}
                         currentConfig={dynamicConfig}
                         onConfigChange={setDynamicConfig}
+                        reoId={Number(id)}
                     />
                 </div>
 

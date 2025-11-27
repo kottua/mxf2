@@ -32,20 +32,41 @@ function StaticParametersPanel({ currentConfig, setStaticConfig, incomePlans, pr
 
     useEffect(() => {
         if (currentConfig) {
-            setBargainGap(currentConfig.bargainGap);
-            setMaxifyFactor(currentConfig.maxify_factor);
-            setCurrentPricePerSqm(currentConfig.current_price_per_sqm);
-            // If onboarding_current_price_per_sqm exists in API, use it; otherwise it will be calculated
+            if (currentConfig.bargainGap !== undefined) {
+                setBargainGap(currentConfig.bargainGap);
+            }
+            if (currentConfig.maxify_factor !== undefined) {
+                setMaxifyFactor(currentConfig.maxify_factor);
+            }
+            if (currentConfig.current_price_per_sqm !== undefined) {
+                setCurrentPricePerSqm(currentConfig.current_price_per_sqm);
+            }
             if (currentConfig.onboarding_current_price_per_sqm !== undefined) {
                 setOnboardingCurrentPricePerSqm(currentConfig.onboarding_current_price_per_sqm);
             }
-            setMinimumLiqRefusalPrice(currentConfig.minimum_liq_refusal_price);
-            setMaximumLiqRefusalPrice(currentConfig.maximum_liq_refusal_price);
-            setOverestimateCorrectFactor(currentConfig.overestimate_correct_factor);
-            setOversoldMethod(currentConfig.oversold_method);
-            setSigma(currentConfig.sigma);
-            setSimilarityThreshold(currentConfig.similarityThreshold);
-            setActiveConfigId(currentConfig.distribConfigId ?? distribConfigs[0]?.id ?? null);
+            if (currentConfig.minimum_liq_refusal_price !== undefined) {
+                setMinimumLiqRefusalPrice(currentConfig.minimum_liq_refusal_price);
+            }
+            if (currentConfig.maximum_liq_refusal_price !== undefined) {
+                setMaximumLiqRefusalPrice(currentConfig.maximum_liq_refusal_price);
+            }
+            if (currentConfig.overestimate_correct_factor !== undefined) {
+                setOverestimateCorrectFactor(currentConfig.overestimate_correct_factor);
+            }
+            if (currentConfig.oversold_method !== undefined) {
+                setOversoldMethod(currentConfig.oversold_method);
+            }
+            if (currentConfig.sigma !== undefined) {
+                setSigma(currentConfig.sigma);
+            }
+            if (currentConfig.similarityThreshold !== undefined) {
+                setSimilarityThreshold(currentConfig.similarityThreshold);
+            }
+            if (currentConfig.distribConfigId !== undefined) {
+                setActiveConfigId(currentConfig.distribConfigId);
+            } else if (distribConfigs.length > 0) {
+                setActiveConfigId(distribConfigs[0].id);
+            }
         } else if (distribConfigs.length > 0) {
             setActiveConfigId(distribConfigs[0].id);
         }
@@ -54,7 +75,7 @@ function StaticParametersPanel({ currentConfig, setStaticConfig, incomePlans, pr
 
     // Calculate current_price_per_sqm - always recalculates
     useEffect(() => {
-        if (premises && incomePlans.length > 0) {
+        if (premises && incomePlans.length > 0 && current_price_per_sqm !== undefined && current_price_per_sqm !== null) {
             const newPrice = calculateOnboardingPrice(
                 { current_price_per_sqm: current_price_per_sqm.toString() },
                 premises,
@@ -67,6 +88,7 @@ function StaticParametersPanel({ currentConfig, setStaticConfig, incomePlans, pr
             console.error('Cannot calculate - missing data:', {
                 hasPremises: !!premises,
                 hasIncomePlans: incomePlans.length > 0,
+                hasCurrentPrice: current_price_per_sqm !== undefined && current_price_per_sqm !== null,
             });
         }
     }, [oversold_method, incomePlans, premises, current_price_per_sqm]);
@@ -74,6 +96,8 @@ function StaticParametersPanel({ currentConfig, setStaticConfig, incomePlans, pr
     useEffect(() => {
         const shouldCalculate = (!currentConfig || currentConfig.onboarding_current_price_per_sqm === undefined) &&
             onboarding_current_price_per_sqm === 0 &&
+            current_price_per_sqm !== undefined &&
+            current_price_per_sqm !== null &&
             current_price_per_sqm > 0 &&
             premises &&
             incomePlans.length > 0;

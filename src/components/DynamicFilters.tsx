@@ -3,18 +3,23 @@ import {useEffect, useState} from "react";
 import type {DynamicParametersConfig} from "../interfaces/DynamicParametersConfig.ts";
 import {getFieldDisplayName} from "../constants/fieldTranslations.ts";
 import styles from "./DynamicFilters.module.css";
+import {api} from "../api/BaseApi.ts";
+import {useNotification} from "../hooks/useNotification.ts";
 
 interface DynamicFiltersProps {
     premises: Premises[];
     currentConfig: DynamicParametersConfig | null;
     onConfigChange: (config: DynamicParametersConfig) => void;
+    reoId: number;
 }
 
-function DynamicFilters({premises, currentConfig, onConfigChange}: DynamicFiltersProps) {
+function DynamicFilters({premises, currentConfig, onConfigChange, reoId}: DynamicFiltersProps) {
+    const { showSuccess, showError } = useNotification();
     const [config, setConfig] = useState<DynamicParametersConfig>({
         importantFields: {},
         weights: {},
     });
+    const [isLoadingBestFlat, setIsLoadingBestFlat] = useState(false);
     const selectedFields = Object.keys(config.importantFields);
 
     useEffect(() => {
@@ -194,6 +199,20 @@ function DynamicFilters({premises, currentConfig, onConfigChange}: DynamicFilter
     const totalWeight = Object.values(config.weights).reduce((sum, weight) => sum + weight, 0);
     const availableFields = getAvailableFields();
 
+    async function handleBestFlatLabel() {
+        setIsLoadingBestFlat(true);
+        try {
+            const response = await api.get(`/agents/best-flat-label/${reoId}`);
+            showSuccess('Метку найкращої квартири успішно отримано!');
+            console.log('Best flat label response:', response.data);
+        } catch (error: any) {
+            console.error("Error fetching best flat label:", error);
+            showError('Не вдалося отримати метку найкращої квартири.');
+        } finally {
+            setIsLoadingBestFlat(false);
+        }
+    }
+
 
     if (availableFields.length === 0){
         return (
@@ -212,15 +231,27 @@ function DynamicFilters({premises, currentConfig, onConfigChange}: DynamicFilter
                 <h4 className={styles.sectionTitle}>Фактори диференціації</h4>
                 <div className={styles.fieldsList}>
                     {availableFields.map(field => (
-                        <label key={field} className={styles.fieldLabel}>
-                            <input
-                                type="checkbox"
-                                checked={!!config.importantFields[field]}
-                                onChange={() => handleFieldToggle(field)}
-                                className={styles.checkbox}
-                            />
-                            <span className={styles.fieldName}>{getFieldDisplayName(field)}</span>
-                        </label>
+                        <div key={field} className={styles.fieldRow}>
+                            <label className={styles.fieldLabel}>
+                                <input
+                                    type="checkbox"
+                                    checked={!!config.importantFields[field]}
+                                    onChange={() => handleFieldToggle(field)}
+                                    className={styles.checkbox}
+                                />
+                                <span className={styles.fieldName}>{getFieldDisplayName(field)}</span>
+                            </label>
+                            {field === 'number' && (
+                                <button
+                                    onClick={handleBestFlatLabel}
+                                    disabled={isLoadingBestFlat}
+                                    className={styles.bestFlatButton}
+                                    title="Отримати естетичний рейтинг номерів"
+                                >
+                                    {isLoadingBestFlat ? '...' : '★'}
+                                </button>
+                            )}
+                        </div>
                     ))}
                 </div>
             </div>
