@@ -2,6 +2,7 @@ import { useState } from "react";
 import { changeRealEstateObject } from "../api/RealEstateObjectApi.ts";
 import { useNotification } from "../hooks/useNotification.ts";
 import styles from './BuildingInfo.module.css';
+import { CurrencyEnum, PropertyClassEnum } from "../types/enums";
 
 interface BuildingInfoProps {
     id: number;
@@ -9,6 +10,7 @@ interface BuildingInfoProps {
     lat?: number;
     lon?: number;
     curr?: string;
+    property_class?: string;
     url?: string;
     is_deleted?: boolean;
     custom_fields?: Record<string, any>;
@@ -21,6 +23,7 @@ function BuildingInfo({
     lat, 
     lon, 
     curr, 
+    property_class,
     url, 
     is_deleted, 
     custom_fields, 
@@ -49,7 +52,8 @@ function BuildingInfo({
                 formData.is_deleted || false, 
                 formData.curr, 
                 formData.url, 
-                formData.custom_fields || {}
+                formData.custom_fields || {},
+                formData.property_class
             );
             showSuccess('Будинок успішно оновлено');
             setIsEditMode(false);
@@ -75,6 +79,7 @@ function BuildingInfo({
                 lat={lat}
                 lon={lon}
                 curr={curr}
+                property_class={property_class}
                 url={url}
                 is_deleted={is_deleted}
                 custom_fields={custom_fields}
@@ -115,6 +120,13 @@ function BuildingInfo({
                     <div className={styles.infoLabel}>Валюта</div>
                     <div className={styles.infoValue}>
                         {curr || 'Не вказано'}
+                    </div>
+                </div>
+
+                <div className={styles.infoItem}>
+                    <div className={styles.infoLabel}>Клас нерухомості</div>
+                    <div className={styles.infoValue}>
+                        {property_class || 'Не вказано'}
                     </div>
                 </div>
 
@@ -169,6 +181,7 @@ interface EditBuildingFormProps {
     lat?: number;
     lon?: number;
     curr?: string;
+    property_class?: string;
     url?: string;
     is_deleted?: boolean;
     custom_fields?: Record<string, any>;
@@ -183,6 +196,7 @@ function EditBuildingForm({
     lat,
     lon,
     curr,
+    property_class,
     url,
     is_deleted,
     custom_fields,
@@ -194,7 +208,8 @@ function EditBuildingForm({
         name: name || '',
         lat: lat?.toString() || '',
         lon: lon?.toString() || '',
-        curr: curr || '',
+        curr: curr || CurrencyEnum.UAH,
+        property_class: property_class || PropertyClassEnum.ECONOMY,
         url: url || '',
         is_deleted: is_deleted || false,
         custom_fields: custom_fields || {}
@@ -245,13 +260,29 @@ function EditBuildingForm({
 
                     <div className={styles.formGroup}>
                         <label htmlFor="curr">Валюта</label>
-                        <input
-                            type="text"
+                        <select
                             id="curr"
                             value={formData.curr}
                             onChange={(e) => handleInputChange('curr', e.target.value)}
-                            placeholder="UAH"
-                        />
+                        >
+                            <option value={CurrencyEnum.UAH}>UAH</option>
+                            <option value={CurrencyEnum.USD}>USD</option>
+                            <option value={CurrencyEnum.EUR}>EUR</option>
+                        </select>
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label htmlFor="property_class">Клас нерухомості</label>
+                        <select
+                            id="property_class"
+                            value={formData.property_class}
+                            onChange={(e) => handleInputChange('property_class', e.target.value)}
+                        >
+                            <option value={PropertyClassEnum.ECONOMY}>Економ</option>
+                            <option value={PropertyClassEnum.COMFORT}>Комфорт</option>
+                            <option value={PropertyClassEnum.BUSINESS}>Бізнес</option>
+                            <option value={PropertyClassEnum.PREMIUM}>Преміум</option>
+                        </select>
                     </div>
                 </div>
 

@@ -35,7 +35,8 @@ export async function changeRealEstateObject(
     status: boolean,
     curr: string,
     url: string,
-    custom_fields: Record<string, unknown>
+    custom_fields: Record<string, unknown>,
+    property_class?: string
 ): Promise<RealEstateObject> {
     const { data } = await api.put<RealEstateObject>(`/real-estate-objects/${id}`, {
         name,
@@ -45,6 +46,7 @@ export async function changeRealEstateObject(
         url,
         is_deleted: status,
         custom_fields,
+        property_class,
     });
     return data;
 }

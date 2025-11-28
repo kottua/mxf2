@@ -51,9 +51,13 @@ export function scoring(
 
         if (typeof value === "number" || !isNaN(parseFloat(value as string))) {
             const numericValue = typeof value === "number" ? value : parseFloat(value as string);
+            const valueStr = numericValue.toString();
 
             for (const priorityGroup of priorities) {
-                if (priorityGroup.values.includes(numericValue.toString())) {
+                if (priorityGroup.values && Array.isArray(priorityGroup.values) && priorityGroup.values.includes(valueStr)) {
+                    return priorityGroup.priority;
+                }
+                if (!priorityGroup.values && priorityGroup.name === valueStr) {
                     return priorityGroup.priority;
                 }
             }
@@ -63,7 +67,10 @@ export function scoring(
 
         const stringValue = value?.toString() || "";
         for (const priorityGroup of priorities) {
-            if (priorityGroup.values.includes(stringValue)) {
+            if (priorityGroup.values && Array.isArray(priorityGroup.values) && priorityGroup.values.includes(stringValue)) {
+                return priorityGroup.priority;
+            }
+            if (!priorityGroup.values && priorityGroup.name === stringValue) {
                 return priorityGroup.priority;
             }
         }

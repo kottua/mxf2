@@ -4,12 +4,15 @@ import type {IncomePlan} from "./IncomePlan.ts";
 import type {StatusMapping} from "./StatusMapping.ts";
 import type {Premises} from "./Premises.ts";
 
+import type { CurrencyEnum, PropertyClassEnum } from "../types/enums";
+
 export interface RealEstateObject {
     id: number;
     name: string;
     lon?: number;
     lat?: number;
-    curr?: string;
+    curr?: CurrencyEnum | string;
+    property_class?: PropertyClassEnum | string;
     url?: string;
     is_deleted: boolean;
     custom_fields?: Record<string, unknown>;

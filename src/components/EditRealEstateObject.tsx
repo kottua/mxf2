@@ -2,6 +2,7 @@ import {type FormEvent, useState} from "react";
 import {changeRealEstateObject} from "../api/RealEstateObjectApi.ts";
 import {useNotification} from "../hooks/useNotification.ts";
 import styles from './EditRealEstateObject.module.css';
+import { CurrencyEnum, PropertyClassEnum } from "../types/enums";
 
 interface EditRealEstateObjectProps {
     id: number;
@@ -9,16 +10,18 @@ interface EditRealEstateObjectProps {
     lat?: number;
     lon?: number;
     curr?: string;
+    property_class?: string;
     url?: string;
     setIsEditMode: (value: boolean) => void;
 }
 
 
-function EditRealEstateObject({ id, name, lat, lon, curr, url, setIsEditMode }: EditRealEstateObjectProps) {
+function EditRealEstateObject({ id, name, lat, lon, curr, property_class, url, setIsEditMode }: EditRealEstateObjectProps) {
     const [formName, setFormName] = useState(name || '');
     const [formLat, setFormLat] = useState(lat ?? '');
     const [formLon, setFormLon] = useState(lon ?? '');
-    const [formCurr, setFormCurr] = useState(curr || '');
+    const [formCurr, setFormCurr] = useState(curr || CurrencyEnum.UAH);
+    const [formPropertyClass, setFormPropertyClass] = useState(property_class || PropertyClassEnum.ECONOMY);
     const [formUrl, setFormUrl] = useState(url || '');
     const [isLoading, setIsLoading] = useState(false);
     const { showError, showSuccess } = useNotification();
@@ -31,10 +34,11 @@ function EditRealEstateObject({ id, name, lat, lon, curr, url, setIsEditMode }: 
             lat: parseFloat(formLat as string),
             lon: parseFloat(formLon as string),
             curr: formCurr,
+            property_class: formPropertyClass,
             url: formUrl,
         };
         try {
-            await changeRealEstateObject(id, payload.name, payload.lat, payload.lon, false, payload.curr, payload.url, {});
+            await changeRealEstateObject(id, payload.name, payload.lat, payload.lon, false, payload.curr, payload.url, {}, payload.property_class);
             showSuccess('Будинок успішно оновлено');
             setIsEditMode(false);
         } catch (error: any) {
@@ -107,13 +111,29 @@ function EditRealEstateObject({ id, name, lat, lon, curr, url, setIsEditMode }: 
 
                 <div className={styles.formGroup}>
                     <label htmlFor="curr">Валюта будинку</label>
-                    <input
-                        type="text"
-                        value={formCurr}
+                    <select
                         id="curr"
+                        value={formCurr}
                         onChange={(e) => setFormCurr(e.target.value)}
-                        placeholder="UAH"
-                    />
+                    >
+                        <option value={CurrencyEnum.UAH}>UAH</option>
+                        <option value={CurrencyEnum.USD}>USD</option>
+                        <option value={CurrencyEnum.EUR}>EUR</option>
+                    </select>
+                </div>
+
+                <div className={styles.formGroup}>
+                    <label htmlFor="property_class">Клас нерухомості</label>
+                    <select
+                        id="property_class"
+                        value={formPropertyClass}
+                        onChange={(e) => setFormPropertyClass(e.target.value)}
+                    >
+                        <option value={PropertyClassEnum.ECONOMY}>Економ</option>
+                        <option value={PropertyClassEnum.COMFORT}>Комфорт</option>
+                        <option value={PropertyClassEnum.BUSINESS}>Бізнес</option>
+                        <option value={PropertyClassEnum.PREMIUM}>Преміум</option>
+                    </select>
                 </div>
 
                 <div className={styles.formGroup}>

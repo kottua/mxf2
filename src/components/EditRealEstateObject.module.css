@@ -61,7 +61,8 @@
     color: #374151;
 }
 
-.formGroup input {
+.formGroup input,
+.formGroup select {
     padding: 0.75rem 1rem;
     border: 2px solid #e5e7eb;
     border-radius: 8px;
@@ -71,7 +72,8 @@
     background: white;
 }
 
-.formGroup input:focus {
+.formGroup input:focus,
+.formGroup select:focus {
     outline: none;
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
@@ -79,6 +81,14 @@
 
 .formGroup input::placeholder {
     color: #9ca3af;
+}
+
+.formGroup select {
+    cursor: pointer;
+}
+
+.formGroup select option {
+    padding: 0.5rem;
 }
 
 .submitButton {
@@ -108,7 +118,8 @@
         font-size: 1.3rem;
     }
 
-    .formGroup input {
+    .formGroup input,
+    .formGroup select {
         padding: 0.625rem 0.875rem;
     }
 

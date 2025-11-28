@@ -160,6 +160,7 @@ function OnboardingPage() {
                     lat={activeObject.lat}
                     lon={activeObject.lon}
                     curr={activeObject.curr}
+                    property_class={activeObject.property_class}
                     url={activeObject.url}
                     is_deleted={activeObject.is_deleted}
                     custom_fields={activeObject.custom_fields}

@@ -12,7 +12,7 @@ interface PremisesParametersProps {
 
 interface PriorityItem {
     name: string;
-    values: string[];
+    values?: string[];
     priority: number;
 }
 

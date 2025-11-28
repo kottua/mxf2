@@ -20,6 +20,7 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId}: Dynami
         weights: {},
     });
     const [isLoadingBestFlat, setIsLoadingBestFlat] = useState(false);
+    const [isLoadingBestFloor, setIsLoadingBestFloor] = useState(false);
     const selectedFields = Object.keys(config.importantFields);
 
     useEffect(() => {
@@ -213,6 +214,20 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId}: Dynami
         }
     }
 
+    async function handleBestFloorLabel() {
+        setIsLoadingBestFloor(true);
+        try {
+            const response = await api.get(`/agents/best-floor/${reoId}`);
+            showSuccess('Метку найкращого поверху успішно отримано!');
+            console.log('Best floor label response:', response.data);
+        } catch (error: any) {
+            console.error("Error fetching best floor label:", error);
+            showError('Не вдалося отримати метку найкращого поверху.');
+        } finally {
+            setIsLoadingBestFloor(false);
+        }
+    }
+
 
     if (availableFields.length === 0){
         return (
@@ -249,6 +264,16 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId}: Dynami
                                     title="Отримати естетичний рейтинг номерів"
                                 >
                                     {isLoadingBestFlat ? '...' : '★'}
+                                </button>
+                            )}
+                            {field === 'floor' && (
+                                <button
+                                    onClick={handleBestFloorLabel}
+                                    disabled={isLoadingBestFloor}
+                                    className={styles.bestFlatButton}
+                                    title="Отримати естетичний рейтинг поверхів"
+                                >
+                                    {isLoadingBestFloor ? '...' : '★'}
                                 </button>
                             )}
                         </div>
