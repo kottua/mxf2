@@ -1,4 +1,3 @@
-
 export const fieldTranslations: Record<string, string> = {
     'property_type': 'Тип нерухомості',
     'premises_id': 'ID приміщення',
@@ -25,7 +24,8 @@ export const fieldTranslations: Record<string, string> = {
     'status': 'Статус',
     'sales_amount': 'Сума продажу',
     'created_at': 'Дата створення',
-    'updated_at': 'Дата оновлення'
+    'updated_at': 'Дата оновлення',
+    'layout_score': 'Оцінка планування'
 };
 
 export function getFieldDisplayName(fieldName: string): string {

@@ -6,14 +6,17 @@ import styles from "./DynamicFilters.module.css";
 import {api} from "../api/BaseApi.ts";
 import {useNotification} from "../hooks/useNotification.ts";
 
+import type {ColumnPriorities} from "./PremisesParameters.tsx";
+
 interface DynamicFiltersProps {
     premises: Premises[];
     currentConfig: DynamicParametersConfig | null;
     onConfigChange: (config: DynamicParametersConfig) => void;
     reoId: number;
+    ranging?: ColumnPriorities;
 }
 
-function DynamicFilters({premises, currentConfig, onConfigChange, reoId}: DynamicFiltersProps) {
+function DynamicFilters({premises, currentConfig, onConfigChange, reoId, ranging}: DynamicFiltersProps) {
     const { showSuccess, showError } = useNotification();
     const [config, setConfig] = useState<DynamicParametersConfig>({
         importantFields: {},
@@ -150,7 +153,30 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId}: Dynami
             return values.size >= 2;
         });
 
-        return [...filteredBaseFields, ...filteredCustomFields];
+        const availableFieldsFromPremises = [...filteredBaseFields, ...filteredCustomFields];
+        const availableFieldsSet = new Set(availableFieldsFromPremises);
+
+        // Add fields from currentConfig.importantFields that are not in available fields
+        // This ensures that fields like layout_score from API config are shown even if not in premises data
+        if (currentConfig && currentConfig.importantFields) {
+            Object.keys(currentConfig.importantFields).forEach(field => {
+                if (!availableFieldsSet.has(field)) {
+                    availableFieldsSet.add(field);
+                }
+            });
+        }
+
+        // Also add fields from ranging that are not in available fields
+        // This ensures fields from API response are shown even if not in current premises data
+        if (ranging) {
+            Object.keys(ranging).forEach(field => {
+                if (!availableFieldsSet.has(field)) {
+                    availableFieldsSet.add(field);
+                }
+            });
+        }
+
+        return Array.from(availableFieldsSet);
     }
 
     function handleFieldToggle(field: string) {

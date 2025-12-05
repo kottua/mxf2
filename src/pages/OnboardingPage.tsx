@@ -17,9 +17,11 @@ import { updateIncomePlanBulk } from "../api/IncomePlanApi.ts";
 import {useActiveRealEstateObject} from "../contexts/ActiveRealEstateObjectContext.tsx";
 import styles from './OnBoardingPage.module.css';
 import {useNotification} from "../hooks/useNotification.ts";
+import UploadImages from "../components/UploadImages.tsx";
+import { uploadLayoutImages } from "../api/LayoutEvaluatorApi.ts";
 
 function OnboardingPage() {
-    const { showError } = useNotification();
+    const { showError, showSuccess } = useNotification();
     const { id } = useParams();
     const navigate = useNavigate();
     const {activeObject, setActiveObject, isLoading, setIsLoading} = useActiveRealEstateObject();
@@ -29,6 +31,8 @@ function OnboardingPage() {
 
     const [isIncomePreview, setIsIncomePreview] = useState(false);
     const [previewIncomeData, setPreviewIncomeData] = useState<IncomePlanData[]>([]);
+
+    const [selectedImages, setSelectedImages] = useState<File[]>([]);
 
     // Fetch real estate object data
     useEffect(() => {
@@ -109,6 +113,27 @@ function OnboardingPage() {
         }
     }
 
+    // Save uploaded images to the API
+    async function saveImagesData(){
+        setIsLoading(true);
+        try {
+            if (selectedImages.length === 0) {
+                showError('Немає зображень для завантаження.');
+                return;
+            }
+            
+            await uploadLayoutImages(selectedImages, Number(id));
+            showSuccess('Зображення успішно завантажено!');
+            // Clear selected images after successful upload
+            setSelectedImages([]);
+        } catch (error) {
+            console.error('Error saving images:', error);
+            showError('Не вдалося завантажити зображення.');
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
     function handleBackBtn(){
         navigate(-1);
     }
@@ -139,6 +164,13 @@ function OnboardingPage() {
                         disabled={!previewIncomeData || previewIncomeData.length === 0}
                     >
                         Зберегти план доходів
+                    </button>
+                    <button
+                        onClick={saveImagesData} 
+                        className={styles.saveButton}
+                        disabled={selectedImages.length === 0}
+                    >
+                        Зберегти зображення
                     </button>
                     <button
                         onClick={() => navigate("/configure/" + activeObject.id)}
@@ -191,6 +223,15 @@ function OnboardingPage() {
                         previewIncomeData={previewIncomeData}
                         setIsPreview={setIsIncomePreview}
                         setPreviewIncomeData={setPreviewIncomeData}
+                    />
+                </section>
+
+                {/* Upload Images Section */}
+                <section className={styles.uploadSection}>
+                    <UploadImages
+                        reoId={activeObject.id}
+                        selectedImages={selectedImages}
+                        onImagesChange={setSelectedImages}
                     />
                 </section>
             </div>

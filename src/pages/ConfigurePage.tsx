@@ -204,6 +204,7 @@ function ConfigurePage() {
                         currentConfig={dynamicConfig}
                         onConfigChange={setDynamicConfig}
                         reoId={Number(id)}
+                        ranging={priorities}
                     />
                 </div>
 
