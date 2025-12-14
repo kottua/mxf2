@@ -1,0 +1,266 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+.section {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.section h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 1rem 0;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.noData {
+    text-align: center;
+    color: #6b7280;
+    padding: 2rem;
+    font-size: 1rem;
+}
+
+.tableContainer {
+    overflow-x: auto;
+    overflow-y: auto;
+    flex: 1;
+    margin-top: 1rem;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+.table thead {
+    background: #f9fafb;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #1f2937;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.table td {
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: middle;
+}
+
+.table tbody tr:hover {
+    background: #f9fafb;
+}
+
+.layoutTypeCell {
+    min-width: 150px;
+    font-weight: 500;
+}
+
+.imageCell {
+    min-width: 200px;
+}
+
+.actionsCell {
+    min-width: 150px;
+}
+
+.uploadArea {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+}
+
+.fileInput {
+    display: none;
+}
+
+.fileLabel {
+    padding: 0.5rem 1rem;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    display: inline-block;
+}
+
+.fileLabel:hover {
+    background: #2563eb;
+}
+
+.fileLabel:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+.imagePreview {
+    position: relative;
+    display: inline-block;
+    max-width: 200px;
+    max-height: 150px;
+}
+
+.previewImage {
+    max-width: 100%;
+    max-height: 150px;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    object-fit: contain;
+}
+
+.removeButton {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #ef4444;
+    color: white;
+    border: none;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: background-color 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.removeButton:hover {
+    background: #dc2626;
+}
+
+.removeButton:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+.uploadButton {
+    padding: 0.5rem 1rem;
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+}
+
+.uploadButton:hover:not(:disabled) {
+    background: #059669;
+}
+
+.uploadButton:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+.uploadedLabel {
+    color: #10b981;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.actionsGroup {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.deleteButton {
+    padding: 0.4rem 0.8rem;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+}
+
+.deleteButton:hover:not(:disabled) {
+    background: #dc2626;
+}
+
+.deleteButton:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .section {
+        padding: 1.5rem;
+    }
+
+    .section h2 {
+        font-size: 1.3rem;
+    }
+
+    .table {
+        font-size: 0.85rem;
+    }
+
+    .table th,
+    .table td {
+        padding: 0.75rem 0.5rem;
+    }
+
+    .imagePreview {
+        max-width: 150px;
+    }
+
+    .previewImage {
+        max-height: 100px;
+    }
+}
+
+@media (max-width: 480px) {
+    .section {
+        padding: 1rem;
+    }
+
+    .table {
+        font-size: 0.8rem;
+    }
+
+    .table th,
+    .table td {
+        padding: 0.5rem 0.25rem;
+    }
+
+    .fileLabel,
+    .uploadButton {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+    }
+}
+

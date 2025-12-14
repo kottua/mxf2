@@ -1,22 +1,21 @@
 import type {Premises} from "../interfaces/Premises.ts";
-import {useEffect, useState} from "react";
+import {useEffect, useState, useMemo} from "react";
 import type {DynamicParametersConfig} from "../interfaces/DynamicParametersConfig.ts";
 import {getFieldDisplayName} from "../constants/fieldTranslations.ts";
 import styles from "./DynamicFilters.module.css";
 import {api} from "../api/BaseApi.ts";
 import {useNotification} from "../hooks/useNotification.ts";
-
-import type {ColumnPriorities} from "./PremisesParameters.tsx";
+import type {LayoutTypeAttachmentResponse} from "../api/LayoutAttachmentApi.ts";
 
 interface DynamicFiltersProps {
     premises: Premises[];
     currentConfig: DynamicParametersConfig | null;
     onConfigChange: (config: DynamicParametersConfig) => void;
     reoId: number;
-    ranging?: ColumnPriorities;
+    layoutTypeAttachments?: LayoutTypeAttachmentResponse[];
 }
 
-function DynamicFilters({premises, currentConfig, onConfigChange, reoId, ranging}: DynamicFiltersProps) {
+function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutTypeAttachments = []}: DynamicFiltersProps) {
     const { showSuccess, showError } = useNotification();
     const [config, setConfig] = useState<DynamicParametersConfig>({
         importantFields: {},
@@ -24,6 +23,7 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, ranging
     });
     const [isLoadingBestFlat, setIsLoadingBestFlat] = useState(false);
     const [isLoadingBestFloor, setIsLoadingBestFloor] = useState(false);
+    const [isLoadingLayoutEvaluator, setIsLoadingLayoutEvaluator] = useState(false);
     const selectedFields = Object.keys(config.importantFields);
 
     useEffect(() => {
@@ -42,7 +42,7 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, ranging
         'price_per_meter': 'hidden',
         'status': 'hidden',
         'sales_amount': 'hidden',
-        
+
         // Always show fields
         'number_of_unit': 'always',
         'number': 'always',
@@ -51,7 +51,7 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, ranging
         'total_area_m2': 'always',
         'number_of_rooms': 'always',
         'view_from_window': 'always',
-        
+
         // Conditional fields (show if all premises have defined, two or more different values)
         'entrance': 'conditional',
         'full_price': 'conditional',
@@ -100,19 +100,19 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, ranging
 
         const filteredBaseFields = baseFields.filter(field => {
             const rule = fieldVisibilityRules[field];
-            
+
             if (rule === 'hidden') {
                 return false;
             }
-            
+
             if (rule === 'always') {
                 return true;
             }
-            
+
             if (rule === 'conditional') {
                 return shouldShowConditionalField(field);
             }
-            
+
             return true;
         });
 
@@ -153,30 +153,7 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, ranging
             return values.size >= 2;
         });
 
-        const availableFieldsFromPremises = [...filteredBaseFields, ...filteredCustomFields];
-        const availableFieldsSet = new Set(availableFieldsFromPremises);
-
-        // Add fields from currentConfig.importantFields that are not in available fields
-        // This ensures that fields like layout_score from API config are shown even if not in premises data
-        if (currentConfig && currentConfig.importantFields) {
-            Object.keys(currentConfig.importantFields).forEach(field => {
-                if (!availableFieldsSet.has(field)) {
-                    availableFieldsSet.add(field);
-                }
-            });
-        }
-
-        // Also add fields from ranging that are not in available fields
-        // This ensures fields from API response are shown even if not in current premises data
-        if (ranging) {
-            Object.keys(ranging).forEach(field => {
-                if (!availableFieldsSet.has(field)) {
-                    availableFieldsSet.add(field);
-                }
-            });
-        }
-
-        return Array.from(availableFieldsSet);
+        return [...filteredBaseFields, ...filteredCustomFields];
     }
 
     function handleFieldToggle(field: string) {
@@ -254,6 +231,53 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, ranging
         }
     }
 
+    // Проверяем, что все layout_type из premises есть в layout_type_attachments
+    const areAllLayoutTypesUploaded = useMemo(() => {
+        if (!premises || premises.length === 0) {
+            return false;
+        }
+
+        // Получаем уникальные layout_type из premises
+        const uniqueLayoutTypes = new Set<string>();
+        premises.forEach((premise) => {
+            if (premise.layout_type && premise.layout_type.trim() !== '') {
+                uniqueLayoutTypes.add(premise.layout_type.trim());
+            }
+        });
+
+        if (uniqueLayoutTypes.size === 0) {
+            return false;
+        }
+
+        // Проверяем, что для каждого layout_type есть attachment
+        const attachmentLayoutTypes = new Set(
+            layoutTypeAttachments.map((att) => att.layout_type?.trim()).filter(Boolean)
+        );
+
+        // Все layout_type должны быть в attachments
+        for (const layoutType of uniqueLayoutTypes) {
+            if (!attachmentLayoutTypes.has(layoutType)) {
+                return false;
+            }
+        }
+
+        return true;
+    }, [premises, layoutTypeAttachments]);
+
+    async function handleLayoutEvaluator() {
+        setIsLoadingLayoutEvaluator(true);
+        try {
+            const response = await api.post(`/agents/layout-evaluator/${reoId}`);
+            showSuccess('Оцінку планів приміщень успішно отримано!');
+            console.log('Layout evaluator response:', response.data);
+        } catch (error: any) {
+            console.error("Error fetching layout evaluator:", error);
+            showError('Не вдалося отримати оцінку планів приміщень.');
+        } finally {
+            setIsLoadingLayoutEvaluator(false);
+        }
+    }
+
 
     if (availableFields.length === 0){
         return (
@@ -267,7 +291,7 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, ranging
     return (
         <div className={styles.filtersContainer}>
             <h3 className={styles.filtersTitle}>Фільтри</h3>
-            
+
             <div className={styles.filtersSection}>
                 <h4 className={styles.sectionTitle}>Фактори диференціації</h4>
                 <div className={styles.fieldsList}>
@@ -300,6 +324,18 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, ranging
                                     title="Отримати естетичний рейтинг поверхів"
                                 >
                                     {isLoadingBestFloor ? '...' : '★'}
+                                </button>
+                            )}
+                            {field === 'layout_type' && (
+                                <button
+                                    onClick={handleLayoutEvaluator}
+                                    disabled={isLoadingLayoutEvaluator || !areAllLayoutTypesUploaded}
+                                    className={styles.bestFlatButton}
+                                    title={areAllLayoutTypesUploaded 
+                                        ? "Отримати оцінку планів приміщень" 
+                                        : "Спочатку завантажте зображення для всіх типів планувань"}
+                                >
+                                    {isLoadingLayoutEvaluator ? '...' : '★'}
                                 </button>
                             )}
                         </div>

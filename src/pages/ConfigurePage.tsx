@@ -43,7 +43,7 @@ function ConfigurePage() {
 
         setDistribConfigs([]);
         setActiveDistribConfig(null);
-        
+
         getDistributionConfigs();
     }, [id]);
 
@@ -111,15 +111,15 @@ function ConfigurePage() {
             showError("Будь ласка, заповніть динамічні параметри");
             return;
         }
-        
+
         const staticForm = document.querySelector('form') as HTMLFormElement;
         if (!staticForm) {
             showError("Не знайдено форму статичних параметрів");
             return;
         }
-        
+
         const formData = new FormData(staticForm);
-        
+
         // Preserve the old onboarding_current_price_per_sqm if it exists in API
         // This ensures we always send the original onboarding value when updating config
         // onboarding_current_price_per_sqm is calculated only once (at first config creation)
@@ -127,7 +127,7 @@ function ConfigurePage() {
         const onboardingPrice = (staticConfig?.onboarding_current_price_per_sqm !== undefined)
             ? staticConfig.onboarding_current_price_per_sqm
             : Number(formData.get('onboarding_current_price_per_sqm')) || 0;
-        
+
         const staticConfigData: StaticParametersConfig = {
             bargainGap: Number(formData.get('negotiation_discount')) || 0,
             maxify_factor: Number(formData.get('maxify_factor')) || 0,
@@ -141,9 +141,9 @@ function ConfigurePage() {
             similarityThreshold: Number(formData.get('similarityThreshold')) || 0,
             distribConfigId: Number(formData.get('distributionConfig')) || null
         };
-        
+
         setStaticConfig(staticConfigData);
-        
+
         setIsLoading(true);
         try {
             const configToSave: PricingConfig = {
@@ -204,7 +204,7 @@ function ConfigurePage() {
                         currentConfig={dynamicConfig}
                         onConfigChange={setDynamicConfig}
                         reoId={Number(id)}
-                        ranging={priorities}
+                        layoutTypeAttachments={activeObject.layout_type_attachments || []}
                     />
                 </div>
 
