@@ -17,6 +17,7 @@ import { updateIncomePlanBulk } from "../api/IncomePlanApi.ts";
 import {useActiveRealEstateObject} from "../contexts/ActiveRealEstateObjectContext.tsx";
 import styles from './OnBoardingPage.module.css';
 import {useNotification} from "../hooks/useNotification.ts";
+import UploadLayoutPlansFile from "../components/UploadLayoutPlansFile.tsx";
 
 function OnboardingPage() {
     const { showError } = useNotification();
@@ -40,18 +41,30 @@ function OnboardingPage() {
                 try {
                     const response = await fetchRealEstateObject(objId);
                     setActiveObject(response);
+                    
+                    // Обновляем preview данные после загрузки объекта
+                    if (response.premises && response.premises.length > 0){
+                        const formattedPremises = mapPremisesToRealEstateObjectData(response.premises);
+                        setPreviewSpecData(formattedPremises);
+                    }
+                    if (response.income_plans && response.income_plans.length > 0){
+                        const formattedIncomePlans = mapIncomePlanToIncomePlanData(response.income_plans);
+                        setPreviewIncomeData(formattedIncomePlans);
+                    }
                 } catch (error) {
                     console.error("Error fetching real estate object:", error);
                     showError('Не вдалося завантажити дані будинку.');
+                } finally {
+                    setIsLoading(false);
+                }
+            } else {
+                if (activeObject && activeObject.premises && activeObject.premises.length > 0){
+                    const formattedPremises = mapPremisesToRealEstateObjectData(activeObject.premises);
+                    setPreviewSpecData(formattedPremises);
+                    const formattedIncomePlans = mapIncomePlanToIncomePlanData(activeObject.income_plans);
+                    setPreviewIncomeData(formattedIncomePlans);
                 }
             }
-            if (activeObject && activeObject.premises.length > 0){
-                const formattedPremises = mapPremisesToRealEstateObjectData(activeObject.premises);
-                setPreviewSpecData(formattedPremises);
-                const formattedIncomePlans = mapIncomePlanToIncomePlanData(activeObject.income_plans);
-                setPreviewIncomeData(formattedIncomePlans);
-            }
-            setIsLoading(false);
         }
         getObjectData(Number(id));
     }, [id, activeObject, setActiveObject, setIsLoading]);
@@ -74,8 +87,12 @@ function OnboardingPage() {
 
             const transformedData = transformToPremisesCreateRequest(validData, Number(id));
             const response = await updatePremisesBulk(transformedData);
-            const newActiveObject = {...activeObject, premises: response};
-            setActiveObject(newActiveObject);
+            // Обновляем activeObject с актуальными данными, включая layout_attachments
+            const updatedObject = await fetchRealEstateObject(Number(id));
+            setActiveObject(updatedObject);
+            // Обновляем previewSpecData с новыми данными
+            const formattedPremises = mapPremisesToRealEstateObjectData(response);
+            setPreviewSpecData(formattedPremises);
         } catch (error) {
             console.error('Error saving specification data:', error);
             showError('Не вдалося зберегти дані специфікації будинку.');
@@ -192,6 +209,55 @@ function OnboardingPage() {
                         setIsPreview={setIsIncomePreview}
                         setPreviewIncomeData={setPreviewIncomeData}
                     />
+                </section>
+
+                {/* Upload Layout Plans Section */}
+                <section className={styles.uploadSection}>
+                    {activeObject && (
+                        <UploadLayoutPlansFile
+                            previewSpecData={previewSpecData}
+                            reoId={activeObject.id}
+                            layoutAttachments={activeObject.layout_type_attachments || []}
+                            onAttachmentUploaded={async (attachment) => {
+                                // Обновляем activeObject с новым attachment
+                                // Перезагружаем данные из API, чтобы получить актуальные layout_type_attachments
+                                try {
+                                    const updatedObject = await fetchRealEstateObject(activeObject.id);
+                                    setActiveObject(updatedObject);
+                                } catch (error) {
+                                    console.error('Error refreshing activeObject:', error);
+                                    // Если не удалось обновить, обновляем локально
+                                    const updatedAttachments = (activeObject.layout_type_attachments || []).filter(
+                                        (att) => att.layout_type !== attachment.layout_type
+                                    );
+                                    const newActiveObject = {
+                                        ...activeObject,
+                                        layout_type_attachments: [...updatedAttachments, attachment],
+                                    };
+                                    setActiveObject(newActiveObject);
+                                }
+                            }}
+                            onAttachmentDeleted={async (layoutType) => {
+                                // Обновляем activeObject после удаления attachment
+                                // Перезагружаем данные из API, чтобы получить актуальные layout_type_attachments
+                                try {
+                                    const updatedObject = await fetchRealEstateObject(activeObject.id);
+                                    setActiveObject(updatedObject);
+                                } catch (error) {
+                                    console.error('Error refreshing activeObject after delete:', error);
+                                    // Если не удалось обновить, обновляем локально
+                                    const updatedAttachments = (activeObject.layout_type_attachments || []).filter(
+                                        (att) => att.layout_type !== layoutType
+                                    );
+                                    const newActiveObject = {
+                                        ...activeObject,
+                                        layout_type_attachments: updatedAttachments,
+                                    };
+                                    setActiveObject(newActiveObject);
+                                }
+                            }}
+                        />
+                    )}
                 </section>
             </div>
         </main>

@@ -1,19 +1,21 @@
 import type {Premises} from "../interfaces/Premises.ts";
-import {useEffect, useState} from "react";
+import {useEffect, useState, useMemo} from "react";
 import type {DynamicParametersConfig} from "../interfaces/DynamicParametersConfig.ts";
 import {getFieldDisplayName} from "../constants/fieldTranslations.ts";
 import styles from "./DynamicFilters.module.css";
 import {api} from "../api/BaseApi.ts";
 import {useNotification} from "../hooks/useNotification.ts";
+import type {LayoutTypeAttachmentResponse} from "../api/LayoutAttachmentApi.ts";
 
 interface DynamicFiltersProps {
     premises: Premises[];
     currentConfig: DynamicParametersConfig | null;
     onConfigChange: (config: DynamicParametersConfig) => void;
     reoId: number;
+    layoutTypeAttachments?: LayoutTypeAttachmentResponse[];
 }
 
-function DynamicFilters({premises, currentConfig, onConfigChange, reoId}: DynamicFiltersProps) {
+function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutTypeAttachments = []}: DynamicFiltersProps) {
     const { showSuccess, showError } = useNotification();
     const [config, setConfig] = useState<DynamicParametersConfig>({
         importantFields: {},
@@ -21,6 +23,7 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId}: Dynami
     });
     const [isLoadingBestFlat, setIsLoadingBestFlat] = useState(false);
     const [isLoadingBestFloor, setIsLoadingBestFloor] = useState(false);
+    const [isLoadingLayoutEvaluator, setIsLoadingLayoutEvaluator] = useState(false);
     const selectedFields = Object.keys(config.importantFields);
 
     useEffect(() => {
@@ -228,6 +231,53 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId}: Dynami
         }
     }
 
+    // Проверяем, что все layout_type из premises есть в layout_type_attachments
+    const areAllLayoutTypesUploaded = useMemo(() => {
+        if (!premises || premises.length === 0) {
+            return false;
+        }
+
+        // Получаем уникальные layout_type из premises
+        const uniqueLayoutTypes = new Set<string>();
+        premises.forEach((premise) => {
+            if (premise.layout_type && premise.layout_type.trim() !== '') {
+                uniqueLayoutTypes.add(premise.layout_type.trim());
+            }
+        });
+
+        if (uniqueLayoutTypes.size === 0) {
+            return false;
+        }
+
+        // Проверяем, что для каждого layout_type есть attachment
+        const attachmentLayoutTypes = new Set(
+            layoutTypeAttachments.map((att) => att.layout_type?.trim()).filter(Boolean)
+        );
+
+        // Все layout_type должны быть в attachments
+        for (const layoutType of uniqueLayoutTypes) {
+            if (!attachmentLayoutTypes.has(layoutType)) {
+                return false;
+            }
+        }
+
+        return true;
+    }, [premises, layoutTypeAttachments]);
+
+    async function handleLayoutEvaluator() {
+        setIsLoadingLayoutEvaluator(true);
+        try {
+            const response = await api.post(`/agents/layout-evaluator/${reoId}`);
+            showSuccess('Оцінку планів приміщень успішно отримано!');
+            console.log('Layout evaluator response:', response.data);
+        } catch (error: any) {
+            console.error("Error fetching layout evaluator:", error);
+            showError('Не вдалося отримати оцінку планів приміщень.');
+        } finally {
+            setIsLoadingLayoutEvaluator(false);
+        }
+    }
+
 
     if (availableFields.length === 0){
         return (
@@ -274,6 +324,18 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId}: Dynami
                                     title="Отримати естетичний рейтинг поверхів"
                                 >
                                     {isLoadingBestFloor ? '...' : '★'}
+                                </button>
+                            )}
+                            {field === 'layout_type' && (
+                                <button
+                                    onClick={handleLayoutEvaluator}
+                                    disabled={isLoadingLayoutEvaluator || !areAllLayoutTypesUploaded}
+                                    className={styles.bestFlatButton}
+                                    title={areAllLayoutTypesUploaded 
+                                        ? "Отримати оцінку планів приміщень" 
+                                        : "Спочатку завантажте зображення для всіх типів планувань"}
+                                >
+                                    {isLoadingLayoutEvaluator ? '...' : '★'}
                                 </button>
                             )}
                         </div>

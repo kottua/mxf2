@@ -3,6 +3,7 @@ import type { PricingConfig } from "./PricingConfig";
 import type {IncomePlan} from "./IncomePlan.ts";
 import type {StatusMapping} from "./StatusMapping.ts";
 import type {Premises} from "./Premises.ts";
+import type {LayoutTypeAttachmentResponse} from "../api/LayoutAttachmentApi.ts";
 
 import type { CurrencyEnum, PropertyClassEnum } from "../types/enums";
 
@@ -23,6 +24,7 @@ export interface RealEstateObject {
     committed_prices: CommittedPrices[];
     income_plans: IncomePlan[];
     status_mappings: StatusMapping[];
+    layout_type_attachments?: LayoutTypeAttachmentResponse[];
 
     // one to one -> distribution config
 }
