@@ -17,11 +17,9 @@ import { updateIncomePlanBulk } from "../api/IncomePlanApi.ts";
 import {useActiveRealEstateObject} from "../contexts/ActiveRealEstateObjectContext.tsx";
 import styles from './OnBoardingPage.module.css';
 import {useNotification} from "../hooks/useNotification.ts";
-import UploadImages from "../components/UploadImages.tsx";
-import { uploadLayoutImages } from "../api/LayoutEvaluatorApi.ts";
 
 function OnboardingPage() {
-    const { showError, showSuccess } = useNotification();
+    const { showError } = useNotification();
     const { id } = useParams();
     const navigate = useNavigate();
     const {activeObject, setActiveObject, isLoading, setIsLoading} = useActiveRealEstateObject();
@@ -31,8 +29,6 @@ function OnboardingPage() {
 
     const [isIncomePreview, setIsIncomePreview] = useState(false);
     const [previewIncomeData, setPreviewIncomeData] = useState<IncomePlanData[]>([]);
-
-    const [selectedImages, setSelectedImages] = useState<File[]>([]);
 
     // Fetch real estate object data
     useEffect(() => {
@@ -65,17 +61,17 @@ function OnboardingPage() {
         setIsLoading(true);
         try {
             if (!previewSpecData || previewSpecData.length === 0) return;
-            
+
             // Filter out invalid data before saving
-            const validData = previewSpecData.filter(item => 
+            const validData = previewSpecData.filter(item =>
                 item && typeof item === 'object' && Object.keys(item).length > 0
             );
-            
+
             if (validData.length === 0) {
                 showError('Немає валідних даних для збереження.');
                 return;
             }
-            
+
             const transformedData = transformToPremisesCreateRequest(validData, Number(id));
             const response = await updatePremisesBulk(transformedData);
             const newActiveObject = {...activeObject, premises: response};
@@ -93,42 +89,21 @@ function OnboardingPage() {
         setIsLoading(true);
         try {
             if (previewIncomeData.length === 0) return;
-            
+
             console.log('Original income plan data:', previewIncomeData);
             console.log('First item structure:', previewIncomeData[0]);
             console.log('Available keys:', Object.keys(previewIncomeData[0] || {}));
-            
+
             const transformedData = transformToIncomePlanCreateRequest(previewIncomeData, Number(id));
             console.log('Transformed data for API:', transformedData);
             console.log('First transformed item:', transformedData[0]);
-            
+
             const response = await updateIncomePlanBulk(transformedData);
             const newActiveObject = {...activeObject, income_plans: response};
             setActiveObject(newActiveObject);
         } catch (error) {
             console.error('Error saving income plan data:', error);
             showError('Не вдалося зберегти дані плану доходів.');
-        } finally {
-            setIsLoading(false);
-        }
-    }
-
-    // Save uploaded images to the API
-    async function saveImagesData(){
-        setIsLoading(true);
-        try {
-            if (selectedImages.length === 0) {
-                showError('Немає зображень для завантаження.');
-                return;
-            }
-            
-            await uploadLayoutImages(selectedImages, Number(id));
-            showSuccess('Зображення успішно завантажено!');
-            // Clear selected images after successful upload
-            setSelectedImages([]);
-        } catch (error) {
-            console.error('Error saving images:', error);
-            showError('Не вдалося завантажити зображення.');
         } finally {
             setIsLoading(false);
         }
@@ -152,25 +127,18 @@ function OnboardingPage() {
                 <h1 className={styles.pageTitle}>Налаштування будинку</h1>
                 <div className={styles.headerButtons}>
                     <button
-                        onClick={saveSpecificationData} 
+                        onClick={saveSpecificationData}
                         className={styles.saveButton}
                         disabled={!previewSpecData || previewSpecData.length === 0 || !previewSpecData.some(item => item && typeof item === 'object' && Object.keys(item).length > 0)}
                     >
                         Зберегти специфікацію
                     </button>
                     <button
-                        onClick={saveIncomePlanData} 
+                        onClick={saveIncomePlanData}
                         className={styles.saveButton}
                         disabled={!previewIncomeData || previewIncomeData.length === 0}
                     >
                         Зберегти план доходів
-                    </button>
-                    <button
-                        onClick={saveImagesData} 
-                        className={styles.saveButton}
-                        disabled={selectedImages.length === 0}
-                    >
-                        Зберегти зображення
                     </button>
                     <button
                         onClick={() => navigate("/configure/" + activeObject.id)}
@@ -223,15 +191,6 @@ function OnboardingPage() {
                         previewIncomeData={previewIncomeData}
                         setIsPreview={setIsIncomePreview}
                         setPreviewIncomeData={setPreviewIncomeData}
-                    />
-                </section>
-
-                {/* Upload Images Section */}
-                <section className={styles.uploadSection}>
-                    <UploadImages
-                        reoId={activeObject.id}
-                        selectedImages={selectedImages}
-                        onImagesChange={setSelectedImages}
                     />
                 </section>
             </div>

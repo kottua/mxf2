@@ -6,17 +6,14 @@ import styles from "./DynamicFilters.module.css";
 import {api} from "../api/BaseApi.ts";
 import {useNotification} from "../hooks/useNotification.ts";
 
-import type {ColumnPriorities} from "./PremisesParameters.tsx";
-
 interface DynamicFiltersProps {
     premises: Premises[];
     currentConfig: DynamicParametersConfig | null;
     onConfigChange: (config: DynamicParametersConfig) => void;
     reoId: number;
-    ranging?: ColumnPriorities;
 }
 
-function DynamicFilters({premises, currentConfig, onConfigChange, reoId, ranging}: DynamicFiltersProps) {
+function DynamicFilters({premises, currentConfig, onConfigChange, reoId}: DynamicFiltersProps) {
     const { showSuccess, showError } = useNotification();
     const [config, setConfig] = useState<DynamicParametersConfig>({
         importantFields: {},
@@ -42,7 +39,7 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, ranging
         'price_per_meter': 'hidden',
         'status': 'hidden',
         'sales_amount': 'hidden',
-        
+
         // Always show fields
         'number_of_unit': 'always',
         'number': 'always',
@@ -51,7 +48,7 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, ranging
         'total_area_m2': 'always',
         'number_of_rooms': 'always',
         'view_from_window': 'always',
-        
+
         // Conditional fields (show if all premises have defined, two or more different values)
         'entrance': 'conditional',
         'full_price': 'conditional',
@@ -100,19 +97,19 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, ranging
 
         const filteredBaseFields = baseFields.filter(field => {
             const rule = fieldVisibilityRules[field];
-            
+
             if (rule === 'hidden') {
                 return false;
             }
-            
+
             if (rule === 'always') {
                 return true;
             }
-            
+
             if (rule === 'conditional') {
                 return shouldShowConditionalField(field);
             }
-            
+
             return true;
         });
 
@@ -153,30 +150,7 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, ranging
             return values.size >= 2;
         });
 
-        const availableFieldsFromPremises = [...filteredBaseFields, ...filteredCustomFields];
-        const availableFieldsSet = new Set(availableFieldsFromPremises);
-
-        // Add fields from currentConfig.importantFields that are not in available fields
-        // This ensures that fields like layout_score from API config are shown even if not in premises data
-        if (currentConfig && currentConfig.importantFields) {
-            Object.keys(currentConfig.importantFields).forEach(field => {
-                if (!availableFieldsSet.has(field)) {
-                    availableFieldsSet.add(field);
-                }
-            });
-        }
-
-        // Also add fields from ranging that are not in available fields
-        // This ensures fields from API response are shown even if not in current premises data
-        if (ranging) {
-            Object.keys(ranging).forEach(field => {
-                if (!availableFieldsSet.has(field)) {
-                    availableFieldsSet.add(field);
-                }
-            });
-        }
-
-        return Array.from(availableFieldsSet);
+        return [...filteredBaseFields, ...filteredCustomFields];
     }
 
     function handleFieldToggle(field: string) {
@@ -267,7 +241,7 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, ranging
     return (
         <div className={styles.filtersContainer}>
             <h3 className={styles.filtersTitle}>Фільтри</h3>
-            
+
             <div className={styles.filtersSection}>
                 <h4 className={styles.sectionTitle}>Фактори диференціації</h4>
                 <div className={styles.fieldsList}>
