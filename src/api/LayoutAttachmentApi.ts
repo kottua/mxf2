@@ -40,9 +40,6 @@ export async function deleteLayoutTypeAttachment(
     reoId: number,
     layoutType: string
 ): Promise<void> {
-    // Кодируем layout_type для безопасной передачи в URL
-    const encodedLayoutType = encodeURIComponent(layoutType);
-
-    await api.delete(`/premises/layout-attachments/${reoId}/${encodedLayoutType}`);
+    await api.delete(`/premises/layout-attachments/${reoId}/${layoutType}`);
 }
 

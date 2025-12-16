@@ -11,6 +11,7 @@ interface LayoutPlanItem {
     previewUrl: string | null;
     isUploading: boolean;
     isUploaded: boolean;
+    isDeleting: boolean;
     existingAttachment: LayoutTypeAttachmentResponse | null;
 }
 
@@ -19,7 +20,6 @@ interface UploadLayoutPlansFileProps {
     reoId: number;
     layoutAttachments?: LayoutTypeAttachmentResponse[];
     onAttachmentUploaded?: (attachment: LayoutTypeAttachmentResponse) => void;
-    onAttachmentDeleted?: (layoutType: string) => void;
 }
 
 function UploadLayoutPlansFile({
@@ -27,11 +27,9 @@ function UploadLayoutPlansFile({
     reoId,
     layoutAttachments = [],
     onAttachmentUploaded,
-    onAttachmentDeleted,
 }: UploadLayoutPlansFileProps) {
     const { showError, showSuccess } = useNotification();
     const [layoutPlans, setLayoutPlans] = useState<LayoutPlanItem[]>([]);
-    const [deletingLayoutTypes, setDeletingLayoutTypes] = useState<Set<string>>(new Set());
 
     // Получаем уникальные layout_type из загруженных данных спецификации
     const uniqueLayoutTypes = useMemo(() => {
@@ -77,6 +75,7 @@ function UploadLayoutPlansFile({
                     previewUrl,
                     isUploading: false,
                     isUploaded: !!existingAttachment,
+                    isDeleting: false,
                     existingAttachment,
                 };
             });
@@ -86,7 +85,7 @@ function UploadLayoutPlansFile({
         }
     }, [uniqueLayoutTypes, layoutAttachments]);
 
-    const handleFileChange = (layoutType: string, e: ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (layoutType: string, e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
@@ -99,32 +98,18 @@ function UploadLayoutPlansFile({
         // Создаем preview URL
         const previewUrl = URL.createObjectURL(file);
 
-        // Обновляем состояние
+        // Обновляем состояние и сразу начинаем загрузку
         setLayoutPlans((prev) =>
             prev.map((item) =>
                 item.layoutType === layoutType
-                    ? { ...item, file, previewUrl, isUploaded: false }
+                    ? { ...item, file, previewUrl, isUploaded: false, isUploading: true, isDeleting: false }
                     : item
             )
         );
-    };
 
-    const handleUpload = async (layoutType: string) => {
-        const planItem = layoutPlans.find((item) => item.layoutType === layoutType);
-        if (!planItem || !planItem.file) {
-            showError('Будь ласка, виберіть файл для завантаження');
-            return;
-        }
-
-        // Устанавливаем состояние загрузки
-        setLayoutPlans((prev) =>
-            prev.map((item) =>
-                item.layoutType === layoutType ? { ...item, isUploading: true } : item
-            )
-        );
-
+        // Автоматически загружаем файл
         try {
-            const response = await uploadLayoutTypeAttachment(reoId, layoutType, planItem.file);
+            const response = await uploadLayoutTypeAttachment(reoId, layoutType, file);
             showSuccess(`План приміщення для "${layoutType}" успішно завантажено`);
             
             // Уведомляем родительский компонент о загрузке нового attachment
@@ -136,14 +121,19 @@ function UploadLayoutPlansFile({
             setLayoutPlans((prev) =>
                 prev.map((item) => {
                     if (item.layoutType === layoutType) {
+                        // Освобождаем старый preview URL
+                        if (previewUrl) {
+                            URL.revokeObjectURL(previewUrl);
+                        }
                         // Создаем preview URL из base64 ответа
-                        const previewUrl = `data:${response.content_type};base64,${response.base64_file}`;
+                        const newPreviewUrl = `data:${response.content_type};base64,${response.base64_file}`;
                         return {
                             ...item,
                             isUploading: false,
                             isUploaded: true,
+                            isDeleting: false,
                             existingAttachment: response,
-                            previewUrl,
+                            previewUrl: newPreviewUrl,
                         };
                     }
                     return item;
@@ -155,9 +145,16 @@ function UploadLayoutPlansFile({
             
             // Сбрасываем состояние загрузки при ошибке
             setLayoutPlans((prev) =>
-                prev.map((item) =>
-                    item.layoutType === layoutType ? { ...item, isUploading: false } : item
-                )
+                prev.map((item) => {
+                    if (item.layoutType === layoutType) {
+                        // Освобождаем preview URL при ошибке
+                        if (previewUrl) {
+                            URL.revokeObjectURL(previewUrl);
+                        }
+                        return { ...item, isUploading: false, isDeleting: false, file: null, previewUrl: null };
+                    }
+                    return item;
+                })
             );
         }
     };
@@ -195,46 +192,50 @@ function UploadLayoutPlansFile({
         );
     };
 
-    const handleDeleteAttachment = async (layoutType: string) => {
-        if (!confirm(`Ви впевнені, що хочете видалити зображення для "${layoutType}"?`)) {
+    const handleDelete = async (layoutType: string) => {
+        const planItem = layoutPlans.find((item) => item.layoutType === layoutType);
+        if (!planItem || !planItem.existingAttachment) {
+            showError('Немає завантаженого файлу для видалення');
             return;
         }
 
-        setDeletingLayoutTypes((prev) => new Set(prev).add(layoutType));
+        // Устанавливаем состояние удаления
+        setLayoutPlans((prev) =>
+            prev.map((item) =>
+                item.layoutType === layoutType ? { ...item, isDeleting: true } : item
+            )
+        );
 
         try {
             await deleteLayoutTypeAttachment(reoId, layoutType);
-            showSuccess(`Зображення для "${layoutType}" успішно видалено`);
+            showSuccess(`План приміщення для "${layoutType}" успішно видалено`);
             
-            // Уведомляем родительский компонент об удалении
-            if (onAttachmentDeleted) {
-                onAttachmentDeleted(layoutType);
-            }
-            
-            // Обновляем состояние - удаляем preview и attachment
+            // Обновляем состояние после успешного удаления
             setLayoutPlans((prev) =>
                 prev.map((item) => {
                     if (item.layoutType === layoutType) {
                         return {
                             ...item,
-                            file: null,
-                            previewUrl: null,
+                            isDeleting: false,
                             isUploaded: false,
                             existingAttachment: null,
+                            previewUrl: null,
+                            file: null,
                         };
                     }
                     return item;
                 })
             );
         } catch (error: any) {
-            console.error('Помилка видалення зображення:', error);
-            showError(`Не вдалося видалити зображення: ${error.message || 'Невідома помилка'}`);
-        } finally {
-            setDeletingLayoutTypes((prev) => {
-                const newSet = new Set(prev);
-                newSet.delete(layoutType);
-                return newSet;
-            });
+            console.error('Помилка видалення плану приміщення:', error);
+            showError(`Не вдалося видалити план приміщення: ${error.message || 'Невідома помилка'}`);
+            
+            // Сбрасываем состояние удаления при ошибке
+            setLayoutPlans((prev) =>
+                prev.map((item) =>
+                    item.layoutType === layoutType ? { ...item, isDeleting: false } : item
+                )
+            );
         }
     };
 
@@ -316,30 +317,20 @@ function UploadLayoutPlansFile({
                                     )}
                                 </td>
                                 <td className={styles.actionsCell}>
-                                    {item.isUploaded && !item.file ? (
-                                        <div className={styles.actionsGroup}>
+                                    {item.isUploaded ? (
+                                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                             <span className={styles.uploadedLabel}>Завантажено</span>
                                             <button
-                                                onClick={() => handleDeleteAttachment(item.layoutType)}
-                                                disabled={deletingLayoutTypes.has(item.layoutType)}
+                                                onClick={() => handleDelete(item.layoutType)}
+                                                disabled={item.isDeleting || item.isUploading}
                                                 className={styles.deleteButton}
-                                                title="Видалити зображення з сервера"
+                                                title="Видалити з сервера"
                                             >
-                                                {deletingLayoutTypes.has(item.layoutType) ? '...' : 'Видалити'}
+                                                {item.isDeleting ? 'Видалення...' : 'Видалити'}
                                             </button>
                                         </div>
-                                    ) : item.file ? (
-                                        <button
-                                            onClick={() => handleUpload(item.layoutType)}
-                                            disabled={item.isUploading || item.isUploaded}
-                                            className={styles.uploadButton}
-                                        >
-                                            {item.isUploading
-                                                ? 'Завантаження...'
-                                                : item.isUploaded
-                                                ? 'Завантажено'
-                                                : 'Завантажити'}
-                                        </button>
+                                    ) : item.isUploading ? (
+                                        <span className={styles.uploadedLabel}>Завантаження...</span>
                                     ) : null}
                                 </td>
                             </tr>
