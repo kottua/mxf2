@@ -18,6 +18,7 @@ import {useActiveRealEstateObject} from "../contexts/ActiveRealEstateObjectConte
 import styles from './OnBoardingPage.module.css';
 import {useNotification} from "../hooks/useNotification.ts";
 import UploadLayoutPlansFile from "../components/UploadLayoutPlansFile.tsx";
+import UploadWindowViewFile from "../components/UploadWindowViewFile.tsx";
 
 function OnboardingPage() {
     const { showError } = useNotification();
@@ -252,6 +253,55 @@ function OnboardingPage() {
                                     const newActiveObject = {
                                         ...activeObject,
                                         layout_type_attachments: updatedAttachments,
+                                    };
+                                    setActiveObject(newActiveObject);
+                                }
+                            }}
+                        />
+                    )}
+                </section>
+
+                {/* Upload Window View Images Section */}
+                <section className={styles.uploadSection}>
+                    {activeObject && (
+                        <UploadWindowViewFile
+                            previewSpecData={previewSpecData}
+                            reoId={activeObject.id}
+                            windowViewAttachments={activeObject.window_view_attachments || []}
+                            onAttachmentUploaded={async (attachment) => {
+                                // Обновляем activeObject с новым attachment
+                                // Перезагружаем данные из API, чтобы получить актуальные window_view_attachments
+                                try {
+                                    const updatedObject = await fetchRealEstateObject(activeObject.id);
+                                    setActiveObject(updatedObject);
+                                } catch (error) {
+                                    console.error('Error refreshing activeObject:', error);
+                                    // Если не удалось обновить, обновляем локально
+                                    const updatedAttachments = (activeObject.window_view_attachments || []).filter(
+                                        (att) => att.view_from_window !== attachment.view_from_window
+                                    );
+                                    const newActiveObject = {
+                                        ...activeObject,
+                                        window_view_attachments: [...updatedAttachments, attachment],
+                                    };
+                                    setActiveObject(newActiveObject);
+                                }
+                            }}
+                            onAttachmentDeleted={async (viewFromWindow) => {
+                                // Обновляем activeObject после удаления attachment
+                                // Перезагружаем данные из API, чтобы получить актуальные window_view_attachments
+                                try {
+                                    const updatedObject = await fetchRealEstateObject(activeObject.id);
+                                    setActiveObject(updatedObject);
+                                } catch (error) {
+                                    console.error('Error refreshing activeObject after delete:', error);
+                                    // Если не удалось обновить, обновляем локально
+                                    const updatedAttachments = (activeObject.window_view_attachments || []).filter(
+                                        (att) => att.view_from_window !== viewFromWindow
+                                    );
+                                    const newActiveObject = {
+                                        ...activeObject,
+                                        window_view_attachments: updatedAttachments,
                                     };
                                     setActiveObject(newActiveObject);
                                 }
