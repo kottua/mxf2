@@ -89,13 +89,14 @@ function UploadLayoutPlansFile({
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // Проверяем, что это изображение
-        if (!file.type.startsWith('image/')) {
-            showError('Будь ласка, виберіть файл зображення');
+        const isImage = file.type.startsWith('image/');
+        const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+        
+        if (!isImage && !isPdf) {
+            showError('Будь ласка, виберіть файл зображення або PDF');
             return;
         }
 
-        // Создаем preview URL
         const previewUrl = URL.createObjectURL(file);
 
         // Обновляем состояние и сразу начинаем загрузку
@@ -239,6 +240,17 @@ function UploadLayoutPlansFile({
         }
     };
 
+    // Функция для определения типа файла
+    const isPdfFile = (previewUrl: string | null, existingAttachment: LayoutTypeAttachmentResponse | null): boolean => {
+        if (existingAttachment?.content_type === 'application/pdf') {
+            return true;
+        }
+        if (previewUrl?.startsWith('data:application/pdf')) {
+            return true;
+        }
+        return false;
+    };
+
     // Очищаем preview URLs при размонтировании
     useEffect(() => {
         return () => {
@@ -283,16 +295,25 @@ function UploadLayoutPlansFile({
                                 <td className={styles.imageCell}>
                                     {item.previewUrl ? (
                                         <div className={styles.imagePreview}>
-                                            <img
-                                                src={item.previewUrl}
-                                                alt={`План ${item.layoutType}`}
-                                                className={styles.previewImage}
-                                            />
+                                            {isPdfFile(item.previewUrl, item.existingAttachment) ? (
+                                                <iframe
+                                                    src={item.previewUrl}
+                                                    title={`План ${item.layoutType}`}
+                                                    className={styles.previewImage}
+                                                    style={{ width: '100%', height: '300px', border: 'none' }}
+                                                />
+                                            ) : (
+                                                <img
+                                                    src={item.previewUrl}
+                                                    alt={`План ${item.layoutType}`}
+                                                    className={styles.previewImage}
+                                                />
+                                            )}
                                             <button
                                                 onClick={() => handleRemoveFile(item.layoutType)}
                                                 className={styles.removeButton}
                                                 disabled={item.isUploading}
-                                                title="Видалити зображення"
+                                                title="Видалити файл"
                                             >
                                                 ×
                                             </button>
@@ -301,7 +322,7 @@ function UploadLayoutPlansFile({
                                         <div className={styles.uploadArea}>
                                             <input
                                                 type="file"
-                                                accept="image/*"
+                                                accept="image/*,.pdf"
                                                 id={`layout_file_${item.layoutType}`}
                                                 onChange={(e) => handleFileChange(item.layoutType, e)}
                                                 className={styles.fileInput}
@@ -311,7 +332,7 @@ function UploadLayoutPlansFile({
                                                 htmlFor={`layout_file_${item.layoutType}`}
                                                 className={styles.fileLabel}
                                             >
-                                                Обрати зображення
+                                                Обрати файл
                                             </label>
                                         </div>
                                     )}

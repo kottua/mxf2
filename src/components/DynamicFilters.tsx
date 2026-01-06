@@ -206,7 +206,7 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
     async function handleBestFlatLabel() {
         setIsLoadingBestFlat(true);
         try {
-            const response = await api.get(`/agents/best-flat-label/${reoId}`);
+            const response = await api.post(`/agents/best-flat-label/${reoId}`);
             showSuccess('Метку найкращої квартири успішно отримано!');
             console.log('Best flat label response:', response.data);
         } catch (error: any) {
@@ -220,7 +220,7 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
     async function handleBestFloorLabel() {
         setIsLoadingBestFloor(true);
         try {
-            const response = await api.get(`/agents/best-floor/${reoId}`);
+            const response = await api.post(`/agents/best-floor/${reoId}`);
             showSuccess('Метку найкращого поверху успішно отримано!');
             console.log('Best floor label response:', response.data);
         } catch (error: any) {
