@@ -205,6 +205,7 @@ function ConfigurePage() {
                         onConfigChange={setDynamicConfig}
                         reoId={Number(id)}
                         layoutTypeAttachments={activeObject.layout_type_attachments || []}
+                        windowViewAttachments={activeObject.window_view_attachments || []}
                     />
                 </div>
 

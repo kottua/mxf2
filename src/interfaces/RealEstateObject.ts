@@ -4,6 +4,7 @@ import type {IncomePlan} from "./IncomePlan.ts";
 import type {StatusMapping} from "./StatusMapping.ts";
 import type {Premises} from "./Premises.ts";
 import type {LayoutTypeAttachmentResponse} from "../api/LayoutAttachmentApi.ts";
+import type {WindowViewAttachmentResponse} from "../api/WindowViewAttachmentApi.ts";
 
 import type { CurrencyEnum, PropertyClassEnum } from "../types/enums";
 
@@ -25,6 +26,7 @@ export interface RealEstateObject {
     income_plans: IncomePlan[];
     status_mappings: StatusMapping[];
     layout_type_attachments?: LayoutTypeAttachmentResponse[];
+    window_view_attachments?: WindowViewAttachmentResponse[];
 
     // one to one -> distribution config
 }

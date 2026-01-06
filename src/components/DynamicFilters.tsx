@@ -6,6 +6,7 @@ import styles from "./DynamicFilters.module.css";
 import {api} from "../api/BaseApi.ts";
 import {useNotification} from "../hooks/useNotification.ts";
 import type {LayoutTypeAttachmentResponse} from "../api/LayoutAttachmentApi.ts";
+import type {WindowViewAttachmentResponse} from "../api/WindowViewAttachmentApi.ts";
 
 interface DynamicFiltersProps {
     premises: Premises[];
@@ -13,9 +14,10 @@ interface DynamicFiltersProps {
     onConfigChange: (config: DynamicParametersConfig) => void;
     reoId: number;
     layoutTypeAttachments?: LayoutTypeAttachmentResponse[];
+    windowViewAttachments?: WindowViewAttachmentResponse[];
 }
 
-function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutTypeAttachments = []}: DynamicFiltersProps) {
+function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutTypeAttachments = [], windowViewAttachments = []}: DynamicFiltersProps) {
     const { showSuccess, showError } = useNotification();
     const [config, setConfig] = useState<DynamicParametersConfig>({
         importantFields: {},
@@ -24,6 +26,7 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
     const [isLoadingBestFlat, setIsLoadingBestFlat] = useState(false);
     const [isLoadingBestFloor, setIsLoadingBestFloor] = useState(false);
     const [isLoadingLayoutEvaluator, setIsLoadingLayoutEvaluator] = useState(false);
+    const [isLoadingWindowViewEvaluator, setIsLoadingWindowViewEvaluator] = useState(false);
     const selectedFields = Object.keys(config.importantFields);
 
     useEffect(() => {
@@ -278,6 +281,53 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
         }
     }
 
+    // Проверяем, что все view_from_window из premises есть в window_view_attachments
+    const areAllWindowViewsUploaded = useMemo(() => {
+        if (!premises || premises.length === 0) {
+            return false;
+        }
+
+        // Получаем уникальные view_from_window из premises
+        const uniqueWindowViews = new Set<string>();
+        premises.forEach((premise) => {
+            if (premise.view_from_window && premise.view_from_window.trim() !== '') {
+                uniqueWindowViews.add(premise.view_from_window.trim());
+            }
+        });
+
+        if (uniqueWindowViews.size === 0) {
+            return false;
+        }
+
+        // Проверяем, что для каждого view_from_window есть attachment
+        const attachmentWindowViews = new Set(
+            windowViewAttachments.map((att) => att.view_from_window?.trim()).filter(Boolean)
+        );
+
+        // Все view_from_window должны быть в attachments
+        for (const viewFromWindow of uniqueWindowViews) {
+            if (!attachmentWindowViews.has(viewFromWindow)) {
+                return false;
+            }
+        }
+
+        return true;
+    }, [premises, windowViewAttachments]);
+
+    async function handleWindowViewEvaluator() {
+        setIsLoadingWindowViewEvaluator(true);
+        try {
+            const response = await api.post(`/agents/window-view-evaluator/${reoId}`);
+            showSuccess('Оцінку видів з вікна успішно отримано!');
+            console.log('Window view evaluator response:', response.data);
+        } catch (error: any) {
+            console.error("Error fetching window view evaluator:", error);
+            showError('Не вдалося отримати оцінку видів з вікна.');
+        } finally {
+            setIsLoadingWindowViewEvaluator(false);
+        }
+    }
+
 
     if (availableFields.length === 0){
         return (
@@ -336,6 +386,18 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
                                         : "Спочатку завантажте зображення для всіх типів планувань"}
                                 >
                                     {isLoadingLayoutEvaluator ? '...' : '★'}
+                                </button>
+                            )}
+                            {field === 'view_from_window' && (
+                                <button
+                                    onClick={handleWindowViewEvaluator}
+                                    disabled={isLoadingWindowViewEvaluator || !areAllWindowViewsUploaded}
+                                    className={styles.bestFlatButton}
+                                    title={areAllWindowViewsUploaded 
+                                        ? "Отримати оцінку видів з вікна" 
+                                        : "Спочатку завантажте зображення для всіх видів з вікна"}
+                                >
+                                    {isLoadingWindowViewEvaluator ? '...' : '★'}
                                 </button>
                             )}
                         </div>
