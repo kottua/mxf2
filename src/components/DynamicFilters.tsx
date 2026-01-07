@@ -28,6 +28,7 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
     const [isLoadingLayoutEvaluator, setIsLoadingLayoutEvaluator] = useState(false);
     const [isLoadingWindowViewEvaluator, setIsLoadingWindowViewEvaluator] = useState(false);
     const [isLoadingTotalAreaEvaluator, setIsLoadingTotalAreaEvaluator] = useState(false);
+    const [isLoadingEntranceEvaluator, setIsLoadingEntranceEvaluator] = useState(false);
     const selectedFields = Object.keys(config.importantFields);
 
     useEffect(() => {
@@ -315,6 +316,21 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
         return true;
     }, [premises, windowViewAttachments]);
 
+    async function handleEntranceEvaluator() {
+        setIsLoadingEntranceEvaluator(true);
+        try {
+            const response = await api.post(`/agents/best-entrance/${reoId}`);
+            showSuccess('');
+            console.log('Entrance evaluator response:', response.data);
+        } catch (error: any) {
+            console.error("Не вдалося отримати оцінку під'їздів", error);
+            showError('Не вдалося отримати оцінку під\'їздів.');
+        } finally {
+            setIsLoadingEntranceEvaluator(false);
+        }
+
+    }
+
     async function handleTotalAreaEvaluator() {
         setIsLoadingTotalAreaEvaluator(true);
         try {
@@ -422,6 +438,16 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
                                     title={"Отримати оцінку загальної площі"}
                                 >
                                     {isLoadingTotalAreaEvaluator ? '...' : '★'}
+                                </button>
+                            )}
+                            {field === 'entrance' && (
+                                <button
+                                    onClick={handleEntranceEvaluator}
+                                    disabled={isLoadingEntranceEvaluator}
+                                    className={styles.bestFlatButton}
+                                    title={"Отримати оцінку під'їздів"}
+                                >
+                                    {isLoadingEntranceEvaluator ? '...' : '★'}
                                 </button>
                             )}
                         </div>
