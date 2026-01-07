@@ -27,6 +27,7 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
     const [isLoadingBestFloor, setIsLoadingBestFloor] = useState(false);
     const [isLoadingLayoutEvaluator, setIsLoadingLayoutEvaluator] = useState(false);
     const [isLoadingWindowViewEvaluator, setIsLoadingWindowViewEvaluator] = useState(false);
+    const [isLoadingTotalAreaEvaluator, setIsLoadingTotalAreaEvaluator] = useState(false);
     const selectedFields = Object.keys(config.importantFields);
 
     useEffect(() => {
@@ -314,6 +315,19 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
         return true;
     }, [premises, windowViewAttachments]);
 
+    async function handleTotalAreaEvaluator() {
+        setIsLoadingTotalAreaEvaluator(true);
+        try {
+            const response = await api.post(`/agents/total_area-evaluator/${reoId}`);
+            showSuccess('Оцінку загальної площі успішно отримано!');
+        } catch (error: any) {
+            console.error('Error fetching total area evaluator:', error);
+            showError('Не вдалося отримати оцінку загальної площі.');
+        } finally {
+            setIsLoadingTotalAreaEvaluator(false);
+        }
+    }
+
     async function handleWindowViewEvaluator() {
         setIsLoadingWindowViewEvaluator(true);
         try {
@@ -398,6 +412,16 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
                                         : "Спочатку завантажте зображення для всіх видів з вікна"}
                                 >
                                     {isLoadingWindowViewEvaluator ? '...' : '★'}
+                                </button>
+                            )}
+                            {field === 'total_area_m2' && (
+                                <button
+                                    onClick={handleTotalAreaEvaluator}
+                                    disabled={isLoadingTotalAreaEvaluator}
+                                    className={styles.bestFlatButton}
+                                    title={"Отримати оцінку загальної площі"}
+                                >
+                                    {isLoadingTotalAreaEvaluator ? '...' : '★'}
                                 </button>
                             )}
                         </div>
