@@ -7,14 +7,14 @@ export async function updateIncomePlanBulk(request) {
     return data;
 }
 
-export async function uploadIncomePlansFile(file) {
+export async function uploadIncomePlansFile(file, reoId) {
     const formData = new FormData();
     formData.append('file', file);
     
     console.log('Sending income plans file to API');
     
     const { data } = await api.post(
-        "/income-plans/upload/income-plans", 
+        `/income-plans/upload/${reoId}`, 
         formData,
         {
             headers: {

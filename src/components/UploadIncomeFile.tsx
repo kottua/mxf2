@@ -13,6 +13,7 @@ interface UploadIncomeFileProps {
     setIsPreview: (value: boolean) => void;
     previewIncomeData: IncomePlanData[];
     setPreviewIncomeData: (data: IncomePlanData[]) => void;
+    reoId: number;
 }
 
 function UploadIncomeFile({
@@ -20,6 +21,7 @@ function UploadIncomeFile({
                               setIsPreview,
                               previewIncomeData,
                               setPreviewIncomeData,
+                              reoId,
                           }: UploadIncomeFileProps) {
     const { showError, showSuccess } = useNotification();
     const [isLoading, setIsLoading] = useState(false);
@@ -33,7 +35,7 @@ function UploadIncomeFile({
 
         setIsLoading(true);
         try {
-            const data = await uploadIncomePlansFile(file);
+            const data = await uploadIncomePlansFile(file, reoId);
 
             if (!data || !Array.isArray(data)) {
                 throw new Error('Invalid response format from API');

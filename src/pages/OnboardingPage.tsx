@@ -209,6 +209,7 @@ function OnboardingPage() {
                         previewIncomeData={previewIncomeData}
                         setIsPreview={setIsIncomePreview}
                         setPreviewIncomeData={setPreviewIncomeData}
+                        reoId={activeObject.id}
                     />
                 </section>
 

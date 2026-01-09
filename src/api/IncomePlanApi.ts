@@ -21,13 +21,14 @@ export async function updateIncomePlanBulk(request: IncomePlanCreateRequest[]): 
 }
 
 export async function uploadIncomePlansFile(
-    file: File
+    file: File,
+    reoId: number
 ): Promise<IncomePlanData[]> {
     const formData = new FormData();
     formData.append('file', file);
 
     const { data } = await api.post<IncomePlanData[]>(
-        "/income-plans/upload/income-plans", 
+        `/income-plans/upload/${reoId}`,
         formData,
         {
             headers: {
