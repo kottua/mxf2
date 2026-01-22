@@ -38,11 +38,6 @@ export async function updatePremisesBulk(request: PremisesCreateRequest[]){
     return data;
 }
 
-export interface UploadSpecificationParams {
-    page?: number;
-    per_page?: number;
-}
-
 export async function uploadSpecificationFile(
     file: File,
     reoId: number

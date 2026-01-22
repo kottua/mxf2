@@ -29,6 +29,7 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
     const [isLoadingWindowViewEvaluator, setIsLoadingWindowViewEvaluator] = useState(false);
     const [isLoadingTotalAreaEvaluator, setIsLoadingTotalAreaEvaluator] = useState(false);
     const [isLoadingEntranceEvaluator, setIsLoadingEntranceEvaluator] = useState(false);
+    const [isLoadingRoomQuantityEvaluator, setIsLoadingRoomQuantityEvaluator] = useState(false);
     const selectedFields = Object.keys(config.importantFields);
 
     useEffect(() => {
@@ -358,6 +359,20 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
         }
     }
 
+    async function handleRoomQuantityEvaluator() {
+        setIsLoadingRoomQuantityEvaluator(true);
+        try {
+            const response = await api.post(`/agents/room-quantity-evaluator/${reoId}`);
+            showSuccess('Оцінку кількості кімнат успішно отримано!');
+            console.log('Room quantity evaluator response:', response.data);
+        } catch (error: any) {
+            console.error("Error fetching room quantity evaluator:", error);
+            showError('Не вдалося отримати оцінку кількості кімнат.');
+        } finally {
+            setIsLoadingRoomQuantityEvaluator(false);
+        }
+    }
+
 
     if (availableFields.length === 0){
         return (
@@ -448,6 +463,16 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
                                     title={"Отримати оцінку під'їздів"}
                                 >
                                     {isLoadingEntranceEvaluator ? '...' : '★'}
+                                </button>
+                            )}
+                            {field === 'number_of_rooms' && (
+                                <button
+                                    onClick={handleRoomQuantityEvaluator}
+                                    disabled={isLoadingRoomQuantityEvaluator}
+                                    className={styles.bestFlatButton}
+                                    title={"Отримати оцінку кількості кімнат"}
+                                >
+                                    {isLoadingRoomQuantityEvaluator ? '...' : '★'}
                                 </button>
                             )}
                         </div>
