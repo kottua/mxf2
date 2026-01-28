@@ -99,7 +99,15 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
     }
 
     function getAvailableFields(): string[] {
+        if (!premises || premises.length === 0) {
+            return [];
+        }
+        
         const firstPremise = premises[0];
+        if (!firstPremise) {
+            return [];
+        }
+        
         const baseFields = Object.keys(firstPremise).filter(key =>
             key !== 'id' && key !== 'reo_id' && key !== "uploaded" && key !== "customcontent"
         );
