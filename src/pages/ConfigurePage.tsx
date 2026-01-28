@@ -200,7 +200,7 @@ function ConfigurePage() {
             <div className={styles.contentLayout}>
                 <div className={styles.filtersColumn}>
                     <DynamicFilters
-                        premises={activeObject.premises}
+                        premises={activeObject.premises || []}
                         currentConfig={dynamicConfig}
                         onConfigChange={setDynamicConfig}
                         reoId={Number(id)}

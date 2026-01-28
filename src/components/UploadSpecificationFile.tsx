@@ -12,6 +12,7 @@ interface UploadSpecificationFileProps {
     previewSpecData: RealEstateObjectData[];
     setPreviewSpecData: (data: RealEstateObjectData[]) => void;
     reoId: number;
+    onError?: (message: string) => void;
 }
 
 function UploadSpecificationFile({
@@ -20,8 +21,10 @@ function UploadSpecificationFile({
                                      previewSpecData,
                                      setPreviewSpecData,
                                      reoId,
+                                     onError,
                                  }: UploadSpecificationFileProps) {
-    const { showError, showSuccess } = useNotification();
+    const { showError: localShowError, showSuccess } = useNotification();
+    const showError = onError || localShowError;
     const [isLoading, setIsLoading] = useState(false);
 
     const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -41,9 +44,23 @@ function UploadSpecificationFile({
             
             setPreviewSpecData(data);
             setIsPreview(true);
-        } catch (error) {
-            console.error('Помилка завантаження файлу:', error);
-            showError(`Не вдалося завантажити та обробити Excel-файл: ${error.message || 'Невідома помилка'}`);
+        } catch (error: any) {
+            // Проверяем, является ли это ошибкой IncomePlanRequiredException (422)
+            if (error?.response?.status === 422) {
+                const errorMessage = error?.response?.data?.message || '';
+                
+                // Проверяем, содержит ли сообщение текст об отсутствии активных планов доходов
+                if (errorMessage.includes('No active income plans found') || 
+                    errorMessage.includes('income plans') ||
+                    errorMessage.toLowerCase().includes('income plan')) {
+                    showError('Не знайдено активних планів доходів для вказаного об\'єкта нерухомості. Будь ласка, спочатку завантажте плани доходів.');
+                } else {
+                    showError(errorMessage || 'Помилка валідації даних');
+                }
+            } else {
+                const errorMsg = error?.response?.data?.message || error?.message || 'Невідома помилка';
+                showError(`Не вдалося завантажити та обробити Excel-файл: ${errorMsg}`);
+            }
         } finally {
             setIsLoading(false);
         }

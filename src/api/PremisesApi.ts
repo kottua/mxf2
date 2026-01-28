@@ -45,23 +45,27 @@ export async function uploadSpecificationFile(
     const formData = new FormData();
     formData.append('file', file);
 
-    const { data } = await api.post<RealEstateObjectData[]>(
-        `/premises/upload/specification/${reoId}`, 
-        formData,
-        {
-            headers: {
-                'Content-Type': 'multipart/form-data',
+    try {
+        const { data } = await api.post<RealEstateObjectData[]>(
+            `/premises/upload/specification/${reoId}`, 
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                }
             }
-        }
-    );
+        );
 
-    // Validate that we received an array
-    if (!Array.isArray(data)) {
-        console.error('API response is not an array:', data);
-        throw new Error('API response is not in expected format');
+        // Validate that we received an array
+        if (!Array.isArray(data)) {
+            console.error('API response is not an array:', data);
+            throw new Error('API response is not in expected format');
+        }
+        
+        return data;
+    } catch (error: any) {
+        throw error;
     }
-    
-    return data;
 }
 
 export async function downloadPremisesExcel(

@@ -19,9 +19,10 @@ import styles from './OnBoardingPage.module.css';
 import {useNotification} from "../hooks/useNotification.ts";
 import UploadLayoutPlansFile from "../components/UploadLayoutPlansFile.tsx";
 import UploadWindowViewFile from "../components/UploadWindowViewFile.tsx";
+import Notification from "../components/Notification.tsx";
 
 function OnboardingPage() {
-    const { showError } = useNotification();
+    const { showError, notifications, removeNotification } = useNotification();
     const { id } = useParams();
     const navigate = useNavigate();
     const {activeObject, setActiveObject, isLoading, setIsLoading} = useActiveRealEstateObject();
@@ -199,6 +200,7 @@ function OnboardingPage() {
                         previewSpecData={previewSpecData}
                         setPreviewSpecData={setPreviewSpecData}
                         reoId={activeObject.id}
+                        onError={showError}
                     />
                 </section>
 
@@ -311,6 +313,16 @@ function OnboardingPage() {
                     )}
                 </section>
             </div>
+            
+            {/* Notifications */}
+            {notifications.map(notification => (
+                <Notification
+                    key={notification.id}
+                    message={notification.message}
+                    type={notification.type}
+                    onClose={() => removeNotification(notification.id)}
+                />
+            ))}
         </main>
     );
 }
