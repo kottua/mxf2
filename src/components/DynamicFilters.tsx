@@ -30,6 +30,7 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
     const [isLoadingTotalAreaEvaluator, setIsLoadingTotalAreaEvaluator] = useState(false);
     const [isLoadingEntranceEvaluator, setIsLoadingEntranceEvaluator] = useState(false);
     const [isLoadingRoomQuantityEvaluator, setIsLoadingRoomQuantityEvaluator] = useState(false);
+    const [isLoadingWeightedFactors, setIsLoadingWeightedFactors] = useState(false);
     const selectedFields = Object.keys(config.importantFields);
 
     useEffect(() => {
@@ -245,6 +246,20 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
         }
     }
 
+    async function handleWeightedFactors() {
+        setIsLoadingWeightedFactors(true);
+        try {
+            const response = await api.post(`/agents/weighted-factors/${reoId}`);
+            showSuccess('Фактори диференціації успішно отримано!');
+            console.log('Weighted factors response:', response.data);
+        } catch (error: any) {
+            console.error("Error fetching weighted factors:", error);
+            showError('Не вдалося отримати фактори диференціації.');
+        } finally {
+            setIsLoadingWeightedFactors(false);
+        }
+    }
+
     // Проверяем, что все layout_type из premises есть в layout_type_attachments
     const areAllLayoutTypesUploaded = useMemo(() => {
         if (!premises || premises.length === 0) {
@@ -396,7 +411,17 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
             <h3 className={styles.filtersTitle}>Фільтри</h3>
 
             <div className={styles.filtersSection}>
-                <h4 className={styles.sectionTitle}>Фактори диференціації</h4>
+                <div className={styles.sectionTitleRow}>
+                    <h4 className={styles.sectionTitle}>Фактори диференціації</h4>
+                    <button
+                        onClick={handleWeightedFactors}
+                        disabled={isLoadingWeightedFactors}
+                        className={styles.bestFlatButton}
+                        title="Отримати фактори диференціації"
+                    >
+                        {isLoadingWeightedFactors ? '...' : '★'}
+                    </button>
+                </div>
                 <div className={styles.fieldsList}>
                     {availableFields.map(field => (
                         <div key={field} className={styles.fieldRow}>
