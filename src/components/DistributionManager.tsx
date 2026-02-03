@@ -103,18 +103,30 @@ function DistributionManager({ distribConfigs, setDistribConfigs }: Distribution
                                     <div className={styles.configInfo}>
                                         <h4 className={styles.configName}>
                                             {config.func_name || `Конфігурація ${config.id}`}
+                                            <span
+                                                className={
+                                                    config.config_status === "default"
+                                                        ? styles.configStatusDefault
+                                                        : styles.configStatusCustom
+                                                }
+                                                title={config.config_status === "default" ? "Конфіг за замовчуванням" : "Власний конфіг"}
+                                            >
+                                                {config.config_status === "default" ? "За замовчуванням" : "Власний"}
+                                            </span>
                                         </h4>
                                         <span className={styles.configType}>
                                             {getFunctionDisplayName(String(config.content?.function_type || 'Unknown'))}
                                         </span>
                                     </div>
-                                    <button 
-                                        onClick={() => handleDeleteConfig(config.id)}
-                                        className={styles.deleteButton}
-                                        title="Видалити дистрибуцію"
-                                    >
-                                        🗑️
-                                    </button>
+                                    {config.config_status !== "default" && (
+                                        <button 
+                                            onClick={() => handleDeleteConfig(config.id)}
+                                            className={styles.deleteButton}
+                                            title="Видалити дистрибуцію"
+                                        >
+                                            🗑️
+                                        </button>
+                                    )}
                                 </div>
                                 
                                 <div className={styles.configDetails}>

@@ -172,6 +172,31 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.configStatusDefault,
+.configStatusCustom {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.15rem 0.45rem;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    flex-shrink: 0;
+}
+
+.configStatusDefault {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.configStatusCustom {
+    background: #dcfce7;
+    color: #15803d;
 }
 
 .cardType {

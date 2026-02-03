@@ -95,6 +95,16 @@ function AllDistributionsModal({ isOpen, onClose, distribConfigs, onDeleteConfig
                                         <div className={styles.cardInfo}>
                                             <h4 className={styles.cardName}>
                                                 {config.func_name || `Конфігурація ${config.id}`}
+                                                <span
+                                                    className={
+                                                        config.config_status === "default"
+                                                            ? styles.configStatusDefault
+                                                            : styles.configStatusCustom
+                                                    }
+                                                    title={config.config_status === "default" ? "Конфіг за замовчуванням" : "Власний конфіг"}
+                                                >
+                                                    {config.config_status === "default" ? "За замовчуванням" : "Власний"}
+                                                </span>
                                             </h4>
                                             <span className={styles.cardType}>
                                                 {getFunctionDisplayName(config.content?.function_type || 'Unknown')}
@@ -102,13 +112,15 @@ function AllDistributionsModal({ isOpen, onClose, distribConfigs, onDeleteConfig
                                         </div>
                                         <div className={styles.cardActions}>
                                             <span className={styles.cardId}>ID: {config.id}</span>
-                                            <button 
-                                                onClick={() => onDeleteConfig(config.id)}
-                                                className={styles.deleteButton}
-                                                title="Видалити дистрибуцію"
-                                            >
-                                                🗑️
-                                            </button>
+                                            {config.config_status !== "default" && (
+                                                <button 
+                                                    onClick={() => onDeleteConfig(config.id)}
+                                                    className={styles.deleteButton}
+                                                    title="Видалити дистрибуцію"
+                                                >
+                                                    🗑️
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                     
