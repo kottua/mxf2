@@ -61,14 +61,10 @@ function UploadWindowViewFile({
                     (att) => att.view_from_window?.trim() === normalizedViewFromWindow
                 ) || null;
 
-                // Создаем preview URL из base64, если есть существующее изображение
+                // Используем URL с S3 для превью (изображение по ссылке)
                 let previewUrl: string | null = null;
-                if (existingAttachment && existingAttachment.base64_file) {
-                    // Проверяем, не содержит ли base64_file уже префикс data:
-                    const base64Data = existingAttachment.base64_file.startsWith('data:')
-                        ? existingAttachment.base64_file
-                        : `data:${existingAttachment.content_type || 'image/png'};base64,${existingAttachment.base64_file}`;
-                    previewUrl = base64Data;
+                if (existingAttachment?.url) {
+                    previewUrl = existingAttachment.url;
                 }
 
                 return {
@@ -91,11 +87,11 @@ function UploadWindowViewFile({
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // Проверяем, что это изображение (без PDF)
         const isImage = file.type.startsWith('image/');
-        
-        if (!isImage) {
-            showError('Будь ласка, виберіть файл зображення');
+        const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+
+        if (!isImage && !isPdf) {
+            showError('Будь ласка, виберіть файл зображення або PDF');
             return;
         }
 
@@ -128,8 +124,8 @@ function UploadWindowViewFile({
                         if (previewUrl) {
                             URL.revokeObjectURL(previewUrl);
                         }
-                        // Создаем preview URL из base64 ответа
-                        const newPreviewUrl = `data:${response.content_type};base64,${response.base64_file}`;
+                        // Используем URL с S3 для превью
+                        const newPreviewUrl = response.url;
                         return {
                             ...item,
                             isUploading: false,
@@ -171,9 +167,9 @@ function UploadWindowViewFile({
                         URL.revokeObjectURL(item.previewUrl);
                     }
                     
-                    // Если есть существующее изображение, восстанавливаем его preview
-                    if (item.existingAttachment && item.existingAttachment.base64_file) {
-                        const previewUrl = `data:${item.existingAttachment.content_type};base64,${item.existingAttachment.base64_file}`;
+                    // Если есть существующее изображение, восстанавливаем его preview по URL
+                    if (item.existingAttachment?.url) {
+                        const previewUrl = item.existingAttachment.url;
                         return {
                             ...item,
                             file: null,
@@ -247,6 +243,20 @@ function UploadWindowViewFile({
         }
     };
 
+    // Функция для определения типа файла (PDF или изображение)
+    const isPdfFile = (previewUrl: string | null, existingAttachment: WindowViewAttachmentResponse | null): boolean => {
+        if (existingAttachment?.content_type === 'application/pdf') {
+            return true;
+        }
+        if (previewUrl?.startsWith('data:application/pdf')) {
+            return true;
+        }
+        if (previewUrl?.startsWith('https://') && existingAttachment?.file_name?.toLowerCase().endsWith('.pdf')) {
+            return true;
+        }
+        return false;
+    };
+
     // Очищаем preview URLs при размонтировании
     useEffect(() => {
         return () => {
@@ -291,11 +301,20 @@ function UploadWindowViewFile({
                                 <td className={styles.imageCell}>
                                     {item.previewUrl ? (
                                         <div className={styles.imagePreview}>
-                                            <img
-                                                src={item.previewUrl}
-                                                alt={`Вид з вікна ${item.viewFromWindow}`}
-                                                className={styles.previewImage}
-                                            />
+                                            {isPdfFile(item.previewUrl, item.existingAttachment) ? (
+                                                <iframe
+                                                    src={item.previewUrl}
+                                                    title={`Вид з вікна ${item.viewFromWindow}`}
+                                                    className={styles.previewImage}
+                                                    style={{ width: '100%', height: '300px', border: 'none' }}
+                                                />
+                                            ) : (
+                                                <img
+                                                    src={item.previewUrl}
+                                                    alt={`Вид з вікна ${item.viewFromWindow}`}
+                                                    className={styles.previewImage}
+                                                />
+                                            )}
                                             <button
                                                 onClick={() => handleRemoveFile(item.viewFromWindow)}
                                                 className={styles.removeButton}
@@ -309,7 +328,7 @@ function UploadWindowViewFile({
                                         <div className={styles.uploadArea}>
                                             <input
                                                 type="file"
-                                                accept="image/*"
+                                                accept="image/*,.pdf"
                                                 id={`window_view_file_${item.viewFromWindow}`}
                                                 onChange={(e) => handleFileChange(item.viewFromWindow, e)}
                                                 className={styles.fileInput}

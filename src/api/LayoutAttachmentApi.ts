@@ -3,13 +3,14 @@ import {api} from "./BaseApi.ts";
 export interface LayoutTypeAttachmentResponse {
     id: number;
     reo_id: number;
-    layout_type: string;
+    s3_path?: string;
+    url: string;
+    content_type: string;
     file_name: string;
     file_size: number;
-    content_type: string;
-    base64_file: string;
     created_at: string;
     updated_at: string;
+    layout_type: string;
 }
 
 export async function uploadLayoutTypeAttachment(

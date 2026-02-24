@@ -3,13 +3,14 @@ import {api} from "./BaseApi.ts";
 export interface WindowViewAttachmentResponse {
     id: number;
     reo_id: number;
-    view_from_window: string;
+    s3_path?: string;
+    url: string;
+    content_type: string;
     file_name: string;
     file_size: number;
-    content_type: string;
-    base64_file: string;
     created_at: string;
     updated_at: string;
+    view_from_window: string;
 }
 
 export async function uploadWindowViewAttachment(

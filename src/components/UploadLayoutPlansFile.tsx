@@ -59,14 +59,10 @@ function UploadLayoutPlansFile({
                     (att) => att.layout_type?.trim() === normalizedLayoutType
                 ) || null;
 
-                // Создаем preview URL из base64, если есть существующее изображение
+                // Используем URL с S3 для превью (изображение по ссылке)
                 let previewUrl: string | null = null;
-                if (existingAttachment && existingAttachment.base64_file) {
-                    // Проверяем, не содержит ли base64_file уже префикс data:
-                    const base64Data = existingAttachment.base64_file.startsWith('data:')
-                        ? existingAttachment.base64_file
-                        : `data:${existingAttachment.content_type || 'image/png'};base64,${existingAttachment.base64_file}`;
-                    previewUrl = base64Data;
+                if (existingAttachment?.url) {
+                    previewUrl = existingAttachment.url;
                 }
 
                 return {
@@ -126,8 +122,8 @@ function UploadLayoutPlansFile({
                         if (previewUrl) {
                             URL.revokeObjectURL(previewUrl);
                         }
-                        // Создаем preview URL из base64 ответа
-                        const newPreviewUrl = `data:${response.content_type};base64,${response.base64_file}`;
+                        // Используем URL с S3 для превью
+                        const newPreviewUrl = response.url;
                         return {
                             ...item,
                             isUploading: false,
@@ -169,9 +165,9 @@ function UploadLayoutPlansFile({
                         URL.revokeObjectURL(item.previewUrl);
                     }
                     
-                    // Если есть существующее изображение, восстанавливаем его preview
-                    if (item.existingAttachment && item.existingAttachment.base64_file) {
-                        const previewUrl = `data:${item.existingAttachment.content_type};base64,${item.existingAttachment.base64_file}`;
+                    // Если есть существующее изображение, восстанавливаем его preview по URL
+                    if (item.existingAttachment?.url) {
+                        const previewUrl = item.existingAttachment.url;
                         return {
                             ...item,
                             file: null,
