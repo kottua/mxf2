@@ -1,7 +1,10 @@
 import axios from "axios";
 
+
+const baseURL = import.meta.env.VITE_BASE_URL;
+
 export const api = axios.create({
-    baseURL: "https://mxf2-backend.onrender.com/api/v1",
+    baseURL,
     headers: {
         "Content-Type": "application/json",
         "Accept": "application/json",
