@@ -218,46 +218,70 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
     const totalWeight = Object.values(config.weights).reduce((sum, weight) => sum + weight, 0);
     const availableFields = getAvailableFields();
 
-    async function handleBestFlatLabel() {
-        setIsLoadingBestFlat(true);
+    async function pollTaskStatus(taskId: string): Promise<{ ready: boolean; error: string | null }> {
+        const { data } = await api.get<{ task_id: string; status: string; ready: boolean; error: string | null }>(
+            `/agents/tasks/${taskId}`
+        );
+        return { ready: data.ready, error: data.error };
+    }
+
+    async function runAgentTask(
+        postUrl: string,
+        setLoading: (v: boolean) => void,
+        successMessage: string,
+        errorMessage: string
+    ) {
+        setLoading(true);
         try {
-            const response = await api.post(`/agents/best-flat-label/${reoId}`);
-            showSuccess('Метку найкращої квартири успішно отримано!');
-            console.log('Best flat label response:', response.data);
+            const response = await api.post<{ task_id: string; status: string; reo_id?: number }>(postUrl);
+            const { task_id } = response.data;
+            const pollIntervalMs = 2000;
+            const maxAttempts = 300; // ~10 min
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                const { ready, error } = await pollTaskStatus(task_id);
+                if (error) {
+                    showError(error || errorMessage);
+                    return;
+                }
+                if (ready) {
+                    showSuccess(successMessage);
+                    return;
+                }
+                await new Promise((r) => setTimeout(r, pollIntervalMs));
+            }
+            showError('Час очікування вичерпано. Спробуйте пізніше.');
         } catch (error: any) {
-            console.error("Error fetching best flat label:", error);
-            showError('Не вдалося отримати метку найкращої квартири.');
+            showError(error?.response?.data?.detail ?? errorMessage);
         } finally {
-            setIsLoadingBestFlat(false);
+            setLoading(false);
         }
+    }
+
+    async function handleBestFlatLabel() {
+        await runAgentTask(
+            `/agents/best-flat-label/${reoId}`,
+            setIsLoadingBestFlat,
+            'Метку найкращої квартири успішно отримано!',
+            'Не вдалося отримати метку найкращої квартири.'
+        );
     }
 
     async function handleBestFloorLabel() {
-        setIsLoadingBestFloor(true);
-        try {
-            const response = await api.post(`/agents/best-floor/${reoId}`);
-            showSuccess('Метку найкращого поверху успішно отримано!');
-            console.log('Best floor label response:', response.data);
-        } catch (error: any) {
-            console.error("Error fetching best floor label:", error);
-            showError('Не вдалося отримати метку найкращого поверху.');
-        } finally {
-            setIsLoadingBestFloor(false);
-        }
+        await runAgentTask(
+            `/agents/best-floor/${reoId}`,
+            setIsLoadingBestFloor,
+            'Метку найкращого поверху успішно отримано!',
+            'Не вдалося отримати метку найкращого поверху.'
+        );
     }
 
     async function handleWeightedFactors() {
-        setIsLoadingWeightedFactors(true);
-        try {
-            const response = await api.post(`/agents/weighted-factors/${reoId}`);
-            showSuccess('Фактори диференціації успішно отримано!');
-            console.log('Weighted factors response:', response.data);
-        } catch (error: any) {
-            console.error("Error fetching weighted factors:", error);
-            showError('Не вдалося отримати фактори диференціації.');
-        } finally {
-            setIsLoadingWeightedFactors(false);
-        }
+        await runAgentTask(
+            `/agents/weighted-factors/${reoId}`,
+            setIsLoadingWeightedFactors,
+            'Фактори диференціації успішно отримано!',
+            'Не вдалося отримати фактори диференціації.'
+        );
     }
 
     // Проверяем, что все layout_type из premises есть в layout_type_attachments
@@ -294,17 +318,12 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
     }, [premises, layoutTypeAttachments]);
 
     async function handleLayoutEvaluator() {
-        setIsLoadingLayoutEvaluator(true);
-        try {
-            const response = await api.post(`/agents/layout-evaluator/${reoId}`);
-            showSuccess('Оцінку планів приміщень успішно отримано!');
-            console.log('Layout evaluator response:', response.data);
-        } catch (error: any) {
-            console.error("Error fetching layout evaluator:", error);
-            showError('Не вдалося отримати оцінку планів приміщень.');
-        } finally {
-            setIsLoadingLayoutEvaluator(false);
-        }
+        await runAgentTask(
+            `/agents/layout-evaluator/${reoId}`,
+            setIsLoadingLayoutEvaluator,
+            'Оцінку планів приміщень успішно отримано!',
+            'Не вдалося отримати оцінку планів приміщень.'
+        );
     }
 
     // Проверяем, что все view_from_window из premises есть в window_view_attachments
@@ -341,59 +360,39 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
     }, [premises, windowViewAttachments]);
 
     async function handleEntranceEvaluator() {
-        setIsLoadingEntranceEvaluator(true);
-        try {
-            const response = await api.post(`/agents/best-entrance/${reoId}`);
-            showSuccess('');
-            console.log('Entrance evaluator response:', response.data);
-        } catch (error: any) {
-            console.error("Не вдалося отримати оцінку під'їздів", error);
-            showError('Не вдалося отримати оцінку під\'їздів.');
-        } finally {
-            setIsLoadingEntranceEvaluator(false);
-        }
-
+        await runAgentTask(
+            `/agents/best-entrance/${reoId}`,
+            setIsLoadingEntranceEvaluator,
+            "Оцінку під'їздів успішно отримано!",
+            "Не вдалося отримати оцінку під'їздів."
+        );
     }
 
     async function handleTotalAreaEvaluator() {
-        setIsLoadingTotalAreaEvaluator(true);
-        try {
-            const response = await api.post(`/agents/total_area-evaluator/${reoId}`);
-            showSuccess('Оцінку загальної площі успішно отримано!');
-        } catch (error: any) {
-            console.error('Error fetching total area evaluator:', error);
-            showError('Не вдалося отримати оцінку загальної площі.');
-        } finally {
-            setIsLoadingTotalAreaEvaluator(false);
-        }
+        await runAgentTask(
+            `/agents/total_area-evaluator/${reoId}`,
+            setIsLoadingTotalAreaEvaluator,
+            'Оцінку загальної площі успішно отримано!',
+            'Не вдалося отримати оцінку загальної площі.'
+        );
     }
 
     async function handleWindowViewEvaluator() {
-        setIsLoadingWindowViewEvaluator(true);
-        try {
-            const response = await api.post(`/agents/window-view-evaluator/${reoId}`);
-            showSuccess('Оцінку видів з вікна успішно отримано!');
-            console.log('Window view evaluator response:', response.data);
-        } catch (error: any) {
-            console.error("Error fetching window view evaluator:", error);
-            showError('Не вдалося отримати оцінку видів з вікна.');
-        } finally {
-            setIsLoadingWindowViewEvaluator(false);
-        }
+        await runAgentTask(
+            `/agents/window-view-evaluator/${reoId}`,
+            setIsLoadingWindowViewEvaluator,
+            'Оцінку видів з вікна успішно отримано!',
+            'Не вдалося отримати оцінку видів з вікна.'
+        );
     }
 
     async function handleRoomQuantityEvaluator() {
-        setIsLoadingRoomQuantityEvaluator(true);
-        try {
-            const response = await api.post(`/agents/room-quantity-evaluator/${reoId}`);
-            showSuccess('Оцінку кількості кімнат успішно отримано!');
-            console.log('Room quantity evaluator response:', response.data);
-        } catch (error: any) {
-            console.error("Error fetching room quantity evaluator:", error);
-            showError('Не вдалося отримати оцінку кількості кімнат.');
-        } finally {
-            setIsLoadingRoomQuantityEvaluator(false);
-        }
+        await runAgentTask(
+            `/agents/room-quantity-evaluator/${reoId}`,
+            setIsLoadingRoomQuantityEvaluator,
+            'Оцінку кількості кімнат успішно отримано!',
+            'Не вдалося отримати оцінку кількості кімнат.'
+        );
     }
 
 
@@ -419,7 +418,11 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
                         className={styles.bestFlatButton}
                         title="Отримати фактори диференціації"
                     >
-                        {isLoadingWeightedFactors ? '...' : '★'}
+                        {isLoadingWeightedFactors ? (
+                            <span className={styles.loadingSpinner} aria-hidden />
+                        ) : (
+                            '★'
+                        )}
                     </button>
                 </div>
                 <div className={styles.fieldsList}>
@@ -441,7 +444,11 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
                                     className={styles.bestFlatButton}
                                     title="Отримати естетичний рейтинг номерів"
                                 >
-                                    {isLoadingBestFlat ? '...' : '★'}
+                                    {isLoadingBestFlat ? (
+                                    <span className={styles.loadingSpinner} aria-hidden />
+                                ) : (
+                                    '★'
+                                )}
                                 </button>
                             )}
                             {field === 'floor' && (
@@ -451,7 +458,11 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
                                     className={styles.bestFlatButton}
                                     title="Отримати естетичний рейтинг поверхів"
                                 >
-                                    {isLoadingBestFloor ? '...' : '★'}
+                                    {isLoadingBestFloor ? (
+                                    <span className={styles.loadingSpinner} aria-hidden />
+                                ) : (
+                                    '★'
+                                )}
                                 </button>
                             )}
                             {field === 'layout_type' && (
@@ -463,7 +474,11 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
                                         ? "Отримати оцінку планів приміщень" 
                                         : "Спочатку завантажте зображення для всіх типів планувань"}
                                 >
-                                    {isLoadingLayoutEvaluator ? '...' : '★'}
+                                    {isLoadingLayoutEvaluator ? (
+                                    <span className={styles.loadingSpinner} aria-hidden />
+                                ) : (
+                                    '★'
+                                )}
                                 </button>
                             )}
                             {field === 'view_from_window' && (
@@ -475,7 +490,11 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
                                         ? "Отримати оцінку видів з вікна" 
                                         : "Спочатку завантажте зображення для всіх видів з вікна"}
                                 >
-                                    {isLoadingWindowViewEvaluator ? '...' : '★'}
+                                    {isLoadingWindowViewEvaluator ? (
+                                    <span className={styles.loadingSpinner} aria-hidden />
+                                ) : (
+                                    '★'
+                                )}
                                 </button>
                             )}
                             {field === 'total_area_m2' && (
@@ -485,7 +504,11 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
                                     className={styles.bestFlatButton}
                                     title={"Отримати оцінку загальної площі"}
                                 >
-                                    {isLoadingTotalAreaEvaluator ? '...' : '★'}
+                                    {isLoadingTotalAreaEvaluator ? (
+                                    <span className={styles.loadingSpinner} aria-hidden />
+                                ) : (
+                                    '★'
+                                )}
                                 </button>
                             )}
                             {field === 'entrance' && (
@@ -495,7 +518,11 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
                                     className={styles.bestFlatButton}
                                     title={"Отримати оцінку під'їздів"}
                                 >
-                                    {isLoadingEntranceEvaluator ? '...' : '★'}
+                                    {isLoadingEntranceEvaluator ? (
+                                    <span className={styles.loadingSpinner} aria-hidden />
+                                ) : (
+                                    '★'
+                                )}
                                 </button>
                             )}
                             {field === 'number_of_rooms' && (
@@ -505,7 +532,11 @@ function DynamicFilters({premises, currentConfig, onConfigChange, reoId, layoutT
                                     className={styles.bestFlatButton}
                                     title={"Отримати оцінку кількості кімнат"}
                                 >
-                                    {isLoadingRoomQuantityEvaluator ? '...' : '★'}
+                                    {isLoadingRoomQuantityEvaluator ? (
+                                    <span className={styles.loadingSpinner} aria-hidden />
+                                ) : (
+                                    '★'
+                                )}
                                 </button>
                             )}
                         </div>
