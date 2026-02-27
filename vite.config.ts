@@ -5,8 +5,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     allowedHosts: [
-      'tominand.pp.ua',
-      'www.tominand.pp.ua'
+      'next.maxify.ai'
     ],
     host: true,
     port: 8080
