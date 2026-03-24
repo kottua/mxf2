@@ -95,7 +95,7 @@ jobs:
             --restart unless-stopped \
             --env-file ${{ env.REMOTE_TMP_DIR }}/.env \
             --name ${{ env.CONTAINER_NAME }} \
-            -p 8080:8080 \
+            -p 8180:8080 \
             --network ${{ env.DOCKER_NETWORK_NAME }} \
             ${{ env.IMAGE_NAME }}:latest \
             npm run start:dev
