@@ -1,4 +1,4 @@
-name: Frontend Deployment
+name: "[DEV] Frontend Deployment"
 
 on:
   workflow_dispatch:
@@ -12,11 +12,11 @@ env:
   SERVER_IP: ${{ secrets.SERVER_IP }}
   SSH_KEY_NAME: "~/.ssh/ssh_key"
 
-  IMAGE_NAME: "mxf-frontend"
-  CONTAINER_NAME: "mxf-frontend"
-  IMAGE_TAR: "/tmp/mxf-frontend.tar.gz"
-  REMOTE_TMP_DIR: "/tmp/mxf-frontend"
-  DOCKER_NETWORK_NAME: "mxf-network"
+  IMAGE_NAME: "mxf-frontend-dev"
+  CONTAINER_NAME: "mxf-frontend-dev"
+  IMAGE_TAR: "/tmp/mxf-frontend-dev.tar.gz"
+  REMOTE_TMP_DIR: "/tmp/mxf-frontend-dev"
+  DOCKER_NETWORK_NAME: "mxf-network-dev"
 
 
 jobs:
@@ -70,7 +70,7 @@ jobs:
         run: |
           ssh -i ${{ env.SSH_KEY_NAME }} ${{ env.SERVER_USER }}@${{ env.SERVER_IP }} "mkdir -p ${{ env.REMOTE_TMP_DIR }}"
           scp -i ${{ env.SSH_KEY_NAME }} .env ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.REMOTE_TMP_DIR }}/.env
-          scp -i ${{ env.SSH_KEY_NAME }} ${{ env.IMAGE_TAR }} ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.REMOTE_TMP_DIR }}/mxf-frontend.tar.gz
+          scp -i ${{ env.SSH_KEY_NAME }} ${{ env.IMAGE_TAR }} ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.REMOTE_TMP_DIR }}/mxf-frontend-dev.tar.gz
 
   deploy:
     needs: build-and-upload
@@ -87,7 +87,7 @@ jobs:
       - name: Deploy
         run: |
           ssh -i ${{ env.SSH_KEY_NAME }} ${{ env.SERVER_USER }}@${{ env.SERVER_IP }} << 'EOF'
-            docker load < ${{ env.REMOTE_TMP_DIR }}/mxf-frontend.tar.gz
+            docker load < ${{ env.REMOTE_TMP_DIR }}/mxf-frontend-dev.tar.gz
             docker network create ${{ env.DOCKER_NETWORK_NAME }} || true
             docker stop ${{ env.CONTAINER_NAME }} || true
             docker rm ${{ env.CONTAINER_NAME }} || true
@@ -97,5 +97,6 @@ jobs:
             --name ${{ env.CONTAINER_NAME }} \
             -p 8080:8080 \
             --network ${{ env.DOCKER_NETWORK_NAME }} \
-            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:latest \
+            npm run start:dev
           EOF

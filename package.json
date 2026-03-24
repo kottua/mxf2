@@ -8,6 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "start:dev": "vite preview --port 8180 --host 0.0.0.0",
     "start:prod": "vite preview --port 8080 --host 0.0.0.0"
   },
   "dependencies": {
