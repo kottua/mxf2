@@ -5,7 +5,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     allowedHosts: [
-      'next.maxify.ai'
+      'next.maxify.ai',
+      'devnext.maxify.ai'
     ],
     host: true,
     port: 8080
