@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - develop
 
 env:
   SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
