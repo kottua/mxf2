@@ -3,7 +3,7 @@ import type {DistributionConfig} from "../interfaces/DistributionConfig.ts";
 
 
 export async function createDistributionConfig(func_name: string, content: Record<string, number|string>){
-    const {data} = await api.post("/distribution-configs", {
+    const {data} = await api.post("/distribution-configs/", {
         func_name: func_name,
         content: content
     });
@@ -11,7 +11,7 @@ export async function createDistributionConfig(func_name: string, content: Recor
 }
 
 export async function fetchDistributionConfigs(){
-    const {data} = await api.get<DistributionConfig[]>("/distribution-configs");
+    const {data} = await api.get<DistributionConfig[]>("/distribution-configs/");
     return data;
 }
 
